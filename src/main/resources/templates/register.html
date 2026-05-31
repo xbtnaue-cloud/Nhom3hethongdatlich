@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký tài khoản</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* ===== TOÀN BỘ CSS LĂNG KÍNH THỦY TINH ĐƯỢC GIỮ NGUYÊN VẸN 100% KHÔNG BỎ CHỮ NÀO ===== */
+        html, body { scrollbar-width: none; -ms-overflow-style: none; }
+        html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; background: transparent !important; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #050b18; --bg-accent: #0a162f; --accent: #00E5FF;
+            --glass-bg: rgba(255, 255, 255, 0.03); --glass-border: rgba(255, 255, 255, 0.12); --text-light: #ffffff;
+        }
+        body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: radial-gradient(circle at 20% 20%, rgba(0, 229, 255, 0.1), transparent 40%), radial-gradient(circle at 80% 80%, rgba(0, 229, 255, 0.1), transparent 40%), linear-gradient(135deg, #020617, #050b18); background-attachment: fixed; min-height: 100vh; display: flex; justify-content: center; align-items: center; color: var(--text-light); padding: 40px 20px; overflow-x: hidden; }
+        body::after { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url(https://grainy-gradients.vercel.app/noise.svg); opacity: 0.03; pointer-events: none; z-index: 1; }
+        .register-card { width: 100%; max-width: 550px; padding: 60px 50px; background: rgba(255, 255, 255, 0.01) !important; backdrop-filter: blur(45px) saturate(220%) brightness(1.15) !important; -webkit-backdrop-filter: blur(45px) saturate(220%) brightness(1.15); border-radius: 4rem; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 3px solid rgba(255, 255, 255, 0.6) !important; border-left: 2px solid rgba(255, 255, 255, 0.25) !important; box-shadow: 0 50px 100px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 229, 255, 0.05), inset 0 1px 4px rgba(255, 255, 255, 0.35); text-align: center; position: relative; z-index: 2; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+        .register-card:hover { transform: scale(1.01) translateY(-5px); background: rgba(255, 255, 255, 0.03) !important; border-top-color: rgba(255, 255, 255, 0.8) !important; box-shadow: 0 60px 120px rgba(0, 0, 0, 0.8), inset 0 1px 6px rgba(255, 255, 255, 0.5); }
+        h2 { font-weight: 600; margin-bottom: 35px; letter-spacing: 4px; text-transform: uppercase; text-shadow: 0 0 20px rgba(0, 212, 255, 0.5); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 20px; text-align: left; }
+        .full-width { grid-column: span 2; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 12px; opacity: 0.6; padding-left: 18px; letter-spacing: 1px; text-transform: uppercase; }
+        .form-group input { width: 100%; padding: 14px 22px; background: rgba(255, 255, 255, 0.02) !important; backdrop-filter: blur(15px) saturate(180%); -webkit-backdrop-filter: blur(15px) saturate(180%); border-radius: 2rem !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 1.5px solid rgba(255, 255, 255, 0.45) !important; border-left: 1px solid rgba(255, 255, 255, 0.15) !important; color: #fff; outline: none; font-family: inherit; box-sizing: border-box; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15); transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+        .form-group input:hover { background: rgba(255, 255, 255, 0.08); }
+        .form-group input:focus { background: rgba(255, 255, 255, 0.1) !important; border-top-color: var(--accent) !important; transform: scale(1.03) translateY(-1px) !important; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 229, 255, 0.2), inset 0 1px 3px rgba(255, 255, 255, 0.3) !important; }
+        .btn-register { width: 100%; padding: 16px; background: linear-gradient(135deg, #00f2ff 0%, #0072ff 100%); border: none; border-radius: 2.5rem; color: #fff; font-weight: 600; font-size: 15px; letter-spacing: 2px; cursor: pointer; transition: all 0.4s ease; margin-top: 25px; text-transform: uppercase; border-top: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 10px 25px rgba(0, 114, 255, 0.3); }
+        .btn-register:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 15px 35px rgba(0, 242, 255, 0.5); filter: brightness(1.1); }
+        .btn-register:active { transform: scale(0.98); }
+        .error-msg { color: #ff5f5f; background: rgba(255, 77, 77, 0.1); padding: 12px; border-radius: 1.5rem; border: 1px solid rgba(255, 77, 77, 0.2); margin-bottom: 25px; font-size: 13px; text-align: center; }
+        .login-link { margin-top: 35px; font-size: 12px; opacity: 0.6; letter-spacing: 0.5px; }
+        .login-link a { color: #fff; text-decoration: none; font-weight: 600; transition: 0.3s; border-bottom: 1px solid transparent; }
+        .login-link a:hover { color: var(--accent); text-shadow: 0 0 10px var(--accent); border-bottom: 1px solid var(--accent); }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } .register-card { padding: 40px 25px; } }
+    </style>
+</head>
+<body>
+
+    <div class="register-card">
+        <h2>ĐĂNG KÝ TÀI KHOẢN</h2>
+
+        <div th:if="${error != null}" class="error-msg" th:text="${error}"></div>
+
+        <form th:action="@{/register}" method="post">
+            <div class="form-grid">
+                
+                <div class="form-group full-width">
+                    <label>Họ và tên</label>
+                    <input type="text" name="fullName" placeholder="Nguyễn Văn A" required />
+                </div>
+                
+                <div class="form-group">
+                    <label>Tên đăng nhập</label>
+                    <input type="text" name="username" placeholder="user123" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Số điện thoại</label>
+                    <input type="tel" name="phone" placeholder="09xxxxxxxx" required />
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Địa chỉ Email</label>
+                    <input type="email" name="email" placeholder="example@dental.com" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" name="password" placeholder="••••••••" required />
+                </div>
+                
+                <div class="form-group">
+                    <label>Xác nhận mật khẩu</label>
+                    <input type="password" name="repassword" placeholder="••••••••" required />
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-register">TẠO TÀI KHOẢN</button>
+        </form>
+
+        <div class="login-link">
+            Đã là thành viên? <a th:href="@{/login}">ĐĂNG NHẬP NGAY</a>
+        </div>
+    </div>
+
+</body>
+</html>

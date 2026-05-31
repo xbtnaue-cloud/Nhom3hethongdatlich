@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đội Ngũ Bác Sĩ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <th:block th:replace="~{header :: header-style}"></th:block>
+	<th:block th:replace="~{footer :: footer-style}"></th:block>
+
+    <style>
+        /* ===== TOÀN BỘ CSS LĂNG KÍNH THỦY TINH ĐƯỢC GIỮ NGUYÊN VẸN 100% KHÔNG THAY ĐỔI MỘT CHỮ ===== */
+        html, body {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        html::-webkit-scrollbar, 
+        body::-webkit-scrollbar {
+            width: 0 !important;
+            height: 0 !important;
+            display: none !important;
+            background: transparent !important;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root { 
+            --bg-dark: #050b18; 
+            --bg-accent: #0a162f;
+            --accent: #00E5FF;
+            --glass-bg: rgba(255, 255, 255, 0.03); 
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --text-light: #ffffff;
+        }
+
+        body { 
+            margin: 0; padding: 0;
+            font-family: 'Poppins', sans-serif; 
+            background: radial-gradient(circle at 20% 20%, #00E5FF22, transparent 40%),
+                        radial-gradient(circle at 80% 80%, #00E5FF22, transparent 40%),
+                        linear-gradient(135deg, #020617, #050b18);
+            background-attachment: fixed;
+            color: var(--text-light); 
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        .container { padding: 60px 8%; max-width: 1400px; margin: 0 auto; text-align: center; }
+        .section-header { margin-bottom: 60px; }
+        .section-title { font-size: 38px; font-weight: 800; text-transform: uppercase; letter-spacing: 4px; }
+        .section-title span { color: var(--accent); text-shadow: 0 0 20px rgba(0, 212, 255, 0.4); }
+
+        .dentist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 40px;
+        }
+
+        .dentist-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(30px) saturate(160%);
+            border-radius: 4rem;
+            padding: 40px 20px;
+            border: 1px solid var(--glass-border);
+            border-top: 2px solid rgba(255, 255, 255, 0.4);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.5s ease;
+            text-align: center;
+        }
+
+        .dentist-card:hover {
+            transform: translateY(-15px);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            border-top: 2px solid rgba(255, 255, 255, 0.7);
+        }
+
+        .dentist-avatar {
+            width: 120px; height: 120px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #0072ff);
+            padding: 4px;
+            box-shadow: 0 10px 25px rgba(0, 212, 255, 0.3);
+        }
+
+        .dentist-avatar img {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dentist-card h3 { font-size: 20px; margin-bottom: 8px; letter-spacing: 1px; }
+        .dentist-card .specialty { 
+            color: var(--accent); 
+            font-size: 12px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .dentist-card p {
+            font-size: 13px; color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6; margin-bottom: 25px; padding: 0 15px;
+        }
+
+        .btn-book-dentist {
+            display: inline-block; padding: 12px 30px; border-radius: 2rem;
+            background: rgba(255, 255, 255, 0.05); color: #fff;
+            text-decoration: none; font-size: 12px; font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2); transition: 0.3s;
+        }
+
+        .btn-book-dentist:hover {
+            background: var(--accent); color: #000;
+            border-color: var(--accent); box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+        
+        .dr-booking-detail {
+            margin: 80px auto 120px; max-width: 1000px;
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(35px) saturate(170%);
+            border-radius: 3rem; padding: 40px 50px; border: 1px solid var(--glass-border);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.3); display: grid;
+            grid-template-columns: 0.8fr 1.2fr; gap: 50px; text-align: left;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .dr-profile-col {
+            display: flex; flex-direction: column; align-items: flex-start;
+            gap: 15px; border-right: 1px solid rgba(255, 255, 255, 0.1); padding-right: 30px;
+        }
+
+        .dr-main-av {
+            width: 100% !important; height: 350px !important; max-width: 350px; margin: 0 auto 30px;
+            border-radius: 4rem !important; overflow: hidden; position: relative;
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-top: 4px solid rgba(255, 255, 255, 0.6) !important;
+            border-left: 2px solid rgba(255, 255, 255, 0.3) !important;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), inset 0 1px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .dr-main-av img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease; }
+        .dr-main-av::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 70%, rgba(5, 11, 24, 0.5) 100%); pointer-events: none; }
+        .dr-main-av:hover img { transform: scale(1.1); }
+
+        .dr-name-big { font-size: 20px; color: var(--accent); font-weight: 700; margin-bottom: 5px; }
+        .dr-intro-text { font-size: 13px; color: rgba(255, 255, 255, 0.5); line-height: 1.7; }
+        .dr-loc { font-size: 12px; color: rgba(255, 255, 255, 0.4); margin-top: 10px; }
+
+        .sched-header { margin-bottom: 20px; }
+        .date-navigator { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; background: rgba(255, 255, 255, 0.02); padding: 8px 15px; border-radius: 3rem; width: fit-content; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .date-nav-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.05); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); border-top: 1.5px solid rgba(255, 255, 255, 0.4); }
+        .date-nav-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.15); transform: scale(1.1); box-shadow: 0 0 15px rgba(255, 255, 255, 0.2); border-top-color: #fff; }
+        .date-nav-btn:disabled { opacity: 0.15; cursor: not-allowed; border-top-color: transparent; }
+
+        .sched-day-select { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; color: var(--accent); text-transform: capitalize; min-width: 140px; text-align: center; text-shadow: 0 0 10px rgba(0, 212, 255, 0.3); }
+        .time-slots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 12px; margin-bottom: 25px; }
+        
+        .time-btn { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); border-top: 1.5px solid rgba(255, 255, 255, 0.3); padding: 12px 5px; text-align: center; border-radius: 12px; font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: all 0.3s ease; }
+        .time-btn:hover { background: var(--accent); color: #000; font-weight: 700; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3); border-top-color: #fff; }
+        .booking-fee-note { font-size: 12px; color: rgba(255, 255, 255, 0.3); margin-bottom: 20px; }
+
+        .info-row { padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, 0.05); }
+        .info-row-label { font-size: 11px; text-transform: uppercase; color: rgba(255, 255, 255, 0.3); margin-bottom: 4px; }
+        .info-row-val { font-size: 13.5px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{header :: header}"></div>
+
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Đội ngũ <span>Bác sĩ</span></h2>
+        </div>
+
+        <div class="dentist-grid">
+            <div class="dentist-card">
+                <div class="dentist-avatar">
+                    <img th:src="@{/assets/Images/bt.jpg}" alt="BS. Ba Tồng" />
+                </div>
+                <h3>BS. Xồng Bá Tồng</h3>
+                <span class="specialty">Nha sĩ chuyên khoa</span>
+                <p>Hơn 10 năm kinh nghiệm trong lĩnh vực chỉnh nha và thẩm mỹ nụ cười.</p>
+                <a th:href="@{/booking(dentistID=1)}" class="btn-book-dentist">ĐẶT LỊCH NGAY</a>
+            </div>
+
+            <div class="dentist-card">
+                <div class="dentist-avatar">
+                    <img th:src="@{/assets/Images/xuantruong.jpg}" alt="BS. Xuân Trường" />
+                </div>
+                <h3>BS. Lữ Xuân Trường</h3>
+                <span class="specialty">Nha sĩ chuyên khoa</span>
+                <p>Chuyên gia phục hình sứ và cấy ghép Implant thẩm mỹ.</p>
+                <a th:href="@{/booking(dentistID=2)}" class="btn-book-dentist">ĐẶT LỊCH NGAY</a>
+            </div>
+
+            <div class="dentist-card">
+                <div class="dentist-avatar">
+                    <img th:src="@{/assets/Images/hst.jpg}" alt="BS. Sỹ Tuấn" />
+                </div>
+                <h3>BS. Hồ Sỹ Tuấn</h3>
+                <span class="specialty">Nha sĩ chuyên khoa</span>
+                <p>Chuyên gia điều trị nội nha và nha khoa tổng quát.</p>
+                <a th:href="@{/booking(dentistID=3)}" class="btn-book-dentist">ĐẶT LỊCH NGAY</a>
+            </div>
+        </div>
+
+        <section class="dr-booking-detail" data-dentist-id="1"> 
+            <div class="dr-profile-col">
+                <div class="dr-main-av">
+                    <img th:src="@{/assets/Images/bt.jpg}" alt="Bác sĩ" />
+                </div>
+                <div class="dr-profile-content">
+                    <h3 class="dr-name-big">BS. Xồng Bá Tồng</h3> 
+                    <p class="dr-intro-text">Bác sĩ có nhiều năm kinh nghiệm về Nha khoa, Nha khoa Trẻ em. Chuyên gia Phục Hình tại Nha Khoa NAU.</p> 
+                    <div class="dr-loc"><i class="fa-solid fa-location-dot"></i> Nghệ An</div>
+                </div>
+            </div>
+            <div class="dr-schedule-col">
+                <div class="sched-header">
+                    <div class="date-navigator">
+                        <button type="button" class="date-nav-btn prevDay" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                        <span class="displayDate sched-day-select">Đang tải...</span>
+                        <button type="button" class="date-nav-btn nextDay"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div style="font-size: 12px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6);"><i class="fa-solid fa-calendar-days" style="margin-right: 5px;"></i> Lịch Khám</div>
+                <div class="time-slots-grid timeGrid"></div>
+                <p class="booking-fee-note">Chọn <i class="fa-solid fa-hand-pointer"></i> và đặt (Phí đặt lịch 0đ)</p>
+                <div class="info-row">
+                    <div class="info-row-label">Địa chỉ khám</div>
+                    <div class="info-row-val" style="color: var(--accent); font-weight: 600;">Nha khoa NAU - Cơ sở 1 tp vinh</div>
+                    <div class="info-row-val">Số 51 Lý Tự Trọng, Vinh Phú, Nghệ An</div>
+                </div>
+                <div class="info-row" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div class="info-row-label">Giá khám</div>
+                        <div class="info-row-val">Miễn phí</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="dr-booking-detail" data-dentist-id="2"> 
+            <div class="dr-profile-col">
+                <div class="dr-main-av">
+                    <img th:src="@{/assets/Images/xuantruong.jpg}" alt="Bác sĩ Xuân Trường" />
+                </div>
+                <div class="dr-profile-content">
+                    <h3 class="dr-name-big">BS. Lữ Xuân Trường</h3>
+                    <p class="dr-intro-text">Bác sĩ có nhiều năm kinh nghiệm về Nha khoa tổng quát và Nha khoa Trẻ em. Chuyên gia Phục Hình thẩm mỹ tại hệ thống.</p>
+                    <div class="dr-loc"><i class="fa-solid fa-location-dot"></i> Nghệ An</div>
+                </div>
+            </div>
+            <div class="dr-schedule-col">
+                <div class="sched-header">
+                    <div class="date-navigator">
+                        <button type="button" class="date-nav-btn prevDay" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                        <span class="displayDate sched-day-select">Đang tải...</span>
+                        <button type="button" class="date-nav-btn nextDay"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div style="font-size: 12px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6);"><i class="fa-solid fa-calendar-days" style="margin-right: 5px;"></i> Lịch Khám</div>
+                <div class="time-slots-grid timeGrid"></div>
+                <p class="booking-fee-note">Chọn <i class="fa-solid fa-hand-pointer"></i> và đặt (Phí đặt lịch 0đ)</p>
+                <div class="info-row">
+                    <div class="info-row-label">Địa chỉ khám</div>
+                    <div class="info-row-val" style="color: var(--accent); font-weight: 600;">Nha khoa NAU - Cơ sở 1 tp vinh</div>
+                    <div class="info-row-val">Số 51 Lý Tự Trọng, Vinh Phú, Nghệ An</div>
+                </div>
+                <div class="info-row" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div class="info-row-label">Giá khám</div>
+                        <div class="info-row-val">Miễn phí</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="dr-booking-detail" data-dentist-id="3"> 
+            <div class="dr-profile-col">
+                <div class="dr-main-av">
+                    <img th:src="@{/assets/Images/hst.jpg}" alt="Bác sĩ Hồ Sỹ Tuấn" />
+                </div>
+                <div class="dr-profile-content">
+                    <h3 class="dr-name-big">BS. Hồ Sỹ Tuấn</h3>
+                    <p class="dr-intro-text">Bác sĩ chuyên khoa Nha khoa thẩm mỹ, chuyên gia về dán sứ Veneer và thiết kế nụ cười. Hơn 12 năm kinh nghiệm lâm sàng.</p>
+                    <div class="dr-loc"><i class="fa-solid fa-location-dot"></i> Nghệ An</div>
+                </div>
+            </div>
+            <div class="dr-schedule-col">
+                <div class="sched-header">
+                    <div class="date-navigator">
+                        <button type="button" class="date-nav-btn prevDay" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                        <span class="displayDate sched-day-select">Đang tải...</span>
+                        <button type="button" class="date-nav-btn nextDay"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div style="font-size: 12px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6);"><i class="fa-solid fa-calendar-days" style="margin-right: 5px;"></i> Lịch Khám</div>
+                <div class="time-slots-grid timeGrid"></div>
+                <p class="booking-fee-note">Chọn <i class="fa-solid fa-hand-pointer"></i> và đặt (Phí đặt lịch 0đ)</p>
+                <div class="info-row">
+                    <div class="info-row-label">Địa chỉ khám</div>
+                    <div class="info-row-val" style="color: var(--accent); font-weight: 600;">Nha khoa NAU - Cơ sở 1 tp vinh</div>
+                    <div class="info-row-val">Số 51 Lý Tự Trọng, Vinh Phú, Nghệ An</div>
+                </div>
+                <div class="info-row" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div class="info-row-label">Giá khám</div>
+                        <div class="info-row-val">Miễn phí</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="dr-booking-detail" data-dentist-id="4"> 
+            <div class="dr-profile-col">
+                <div class="dr-main-av">
+                    <img th:src="@{/assets/Images/kim.jpg}" alt="Bác sĩ Kim Dung" />
+                </div>
+                <div class="dr-profile-content">
+                    <h3 class="dr-name-big">BS. Nguyễn Thị Kim Dung</h3>
+                    <p class="dr-intro-text">Chuyên gia Nha khoa Trẻ em và Chỉnh nha tăng trưởng. Bác sĩ tận tâm, nhẹ nhàng, giúp các bé luôn thoải mái khi thăm khám.</p>
+                    <div class="dr-loc"><i class="fa-solid fa-location-dot"></i> Nghệ An</div>
+                </div>
+            </div>
+            <div class="dr-schedule-col">
+                <div class="sched-header">
+                    <div class="date-navigator">
+                        <button type="button" class="date-nav-btn prevDay" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                        <span class="displayDate sched-day-select">Đang tải...</span>
+                        <button type="button" class="date-nav-btn nextDay"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div style="font-size: 12px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6);"><i class="fa-solid fa-calendar-days" style="margin-right: 5px;"></i> Lịch Khám</div>
+                <div class="time-slots-grid timeGrid"></div>
+                <p class="booking-fee-note">Chọn <i class="fa-solid fa-hand-pointer"></i> và đặt (Phí đặt lịch 0đ)</p>
+                <div class="info-row">
+                    <div class="info-row-label">Địa chỉ khám</div>
+                    <div class="info-row-val" style="color: var(--accent); font-weight: 600;">Nha khoa NAU - Cơ sở 1 tp vinh</div>
+                    <div class="info-row-val">Số 51 Lý Tự Trọng, Vinh Phú, Nghệ An</div>
+                </div>
+                <div class="info-row" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div class="info-row-label">Giá khám</div>
+                        <div class="info-row-val">Miễn phí</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="dr-booking-detail" data-dentist-id="5"> 
+            <div class="dr-profile-col">
+                <div class="dr-main-av">
+                    <img th:src="@{/assets/Images/ducbien.jpg}" alt="Bác sĩ Đậu Đức Biên" />
+                </div>
+                <div class="dr-profile-content">
+                    <h3 class="dr-name-big">BS. Đậu Đức Biên</h3>
+                    <p class="dr-intro-text">Chuyên gia về cấy ghép Implant và nhổ răng khôn không đau. Bác sĩ có tay nghề cao với hơn 10 năm kinh nghiệm trong ngành nha khoa.</p>
+                    <div class="dr-loc"><i class="fa-solid fa-location-dot"></i> Nghệ An</div>
+                </div>
+            </div>
+            <div class="dr-schedule-col">
+                <div class="sched-header">
+                    <div class="date-navigator">
+                        <button type="button" class="date-nav-btn prevDay" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                        <span class="displayDate sched-day-select">Đang tải...</span>
+                        <button type="button" class="date-nav-btn nextDay"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div style="font-size: 12px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6);"><i class="fa-solid fa-calendar-days" style="margin-right: 5px;"></i> Lịch Khám</div>
+                <div class="time-slots-grid timeGrid"></div>
+                <p class="booking-fee-note">Chọn <i class="fa-solid fa-hand-pointer"></i> và đặt (Phí đặt lịch 0đ)</p>
+                <div class="info-row">
+                    <div class="info-row-label">Địa chỉ khám</div>
+                    <div class="info-row-val" style="color: var(--accent); font-weight: 600;">Nha khoa NAU - Cơ sở 1 tp vinh</div>
+                    <div class="info-row-val">Số 51 Lý Tự Trọng, Vinh Phú, Nghệ An</div>
+                </div>
+                <div class="info-row" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div class="info-row-label">Giá khám</div>
+                        <div class="info-row-val">Miễn phí</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="dr-booking-detail" data-dentist-id="6"> 
+            <div class="dr-profile-col">
+                <div class="dr-main-av">
+                    <img th:src="@{/assets/Images/luc.jpg}" alt="Bác sĩ Lê Đình Lực" />
+                </div>
+                <div class="dr-profile-content">
+                    <h3 class="dr-name-big">BS. Lê Đình Lực</h3>
+                    <p class="dr-intro-text">Bác sĩ chuyên khoa Chỉnh nha (Niềng răng). Chuyên sâu về các phương pháp niềng răng mắc cài và khay trong suốt Invisalign.</p>
+                    <div class="dr-loc"><i class="fa-solid fa-location-dot"></i> Nghệ An</div>
+                </div>
+            </div>
+            <div class="dr-schedule-col">
+                <div class="sched-header">
+                    <div class="date-navigator">
+                        <button type="button" class="date-nav-btn prevDay" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                        <span class="displayDate sched-day-select">Đang tải...</span>
+                        <button type="button" class="date-nav-btn nextDay"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div style="font-size: 12px; font-weight: 600; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6);"><i class="fa-solid fa-calendar-days" style="margin-right: 5px;"></i> Lịch Khám</div>
+                <div class="time-slots-grid timeGrid"></div>
+                <p class="booking-fee-note">Chọn <i class="fa-solid fa-hand-pointer"></i> và đặt (Phí đặt lịch 0đ)</p>
+                <div class="info-row">
+                    <div class="info-row-label">Địa chỉ khám</div>
+                    <div class="info-row-val" style="color: var(--accent); font-weight: 600;">Nha khoa NAU - Cơ sở 1 tp vinh</div>
+                    <div class="info-row-val">Số 51 Lý Tự Trọng, Vinh Phú, Nghệ An</div>
+                </div>
+                <div class="info-row" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div class="info-row-label">Giá khám</div>
+                        <div class="info-row-val">Miễn phí</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div th:replace="~{footer :: footer}"></div>
+    
+    <script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        const allTimeSlots = ['08:00', '09:00', '10:00', '11:00', '14:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'];
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); 
+
+        // 🛠️ ĐÃ SỬA: Đọc chính xác context path ngầm từ cấu hình Spring Boot
+        var contextPath = /*[[@{/}]]*/ '/';
+        if (contextPath === '/') contextPath = '';
+
+        const drSections = document.querySelectorAll(".dr-booking-detail");
+
+        drSections.forEach(section => {
+            let currentDate = new Date();
+            currentDate.setHours(0, 0, 0, 0);
+
+            const dentistID = section.getAttribute("data-dentist-id");
+            
+            const displayDate = section.querySelector(".displayDate");
+            const timeGrid = section.querySelector(".timeGrid");
+            const prevBtn = section.querySelector(".prevDay");
+            const nextBtn = section.querySelector(".nextDay");
+
+            function render() {
+                const options = { weekday: 'long', day: '2-digit', month: '2-digit' };
+                let dateText = currentDate.toLocaleDateString('vi-VN', options);
+                
+                if (currentDate.getTime() === today.getTime()) {
+                    dateText = "Hôm nay - " + currentDate.getDate() + "/" + (currentDate.getMonth() + 1);
+                    prevBtn.disabled = true;
+                    prevBtn.style.opacity = "0.2";
+                } else {
+                    prevBtn.disabled = false;
+                    prevBtn.style.opacity = "1";
+                }
+                displayDate.innerText = dateText;
+
+                const yyyy = currentDate.getFullYear();
+                const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const dd = String(currentDate.getDate()).padStart(2, '0');
+                const dateParam = yyyy + "-" + mm + "-" + dd;
+
+                timeGrid.innerHTML = "";
+                const now = new Date();
+                let hasSlots = false;
+
+                allTimeSlots.forEach(slot => {
+                    const [h, m] = slot.split(':').map(Number);
+                    let isPast = false;
+
+                    if (currentDate.getTime() === today.getTime()) {
+                        if (now.getHours() > h || (now.getHours() === h && now.getMinutes() >= m)) {
+                            isPast = true;
+                        }
+                    }
+
+                    if (!isPast) {
+                        const btn = document.createElement("a");
+                        btn.href = contextPath + "booking?dentistID=" + dentistID + "&time=" + slot + "&date=" + dateParam;
+                        btn.className = "time-btn";
+                        btn.innerText = slot;
+                        timeGrid.appendChild(btn);
+                        hasSlots = true;
+                    }
+                });
+
+                if (!hasSlots) {
+                    timeGrid.innerHTML = `<p style="grid-column: 1/-1; font-size:12px; color:rgba(255,255,255,0.4); padding: 15px; text-align: center;">
+                        Hết lịch hẹn khả dụng trong ngày ${currentDate.getDate()}/${currentDate.getMonth()+1}. <br> Vui lòng chọn ngày tiếp theo.
+                    </p>`;
+                }
+            }
+
+            nextBtn.onclick = (e) => {
+                e.preventDefault();
+                currentDate.setDate(currentDate.getDate() + 1);
+                render();
+            };
+
+            prevBtn.onclick = (e) => {
+                e.preventDefault();
+                if (currentDate.getTime() > today.getTime()) {
+                    currentDate.setDate(currentDate.getDate() - 1);
+                    render();
+                }
+            };
+
+            render();
+        });
+    });
+</script>
+</body>
+</html>

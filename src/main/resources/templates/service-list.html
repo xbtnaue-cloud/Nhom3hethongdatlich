@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dịch vụ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Cormorant+Garamond:italic,wght@600&family=Plus+Jakarta+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    
+    <th:block th:replace="~{header :: header-style}"></th:block>
+    <th:block th:replace="~{footer :: footer-style}"></th:block>
+
+    <style>
+        /* ===== TOÀN BỘ CSS GIỮ NGUYÊN VẸN 100% TỪ FILE CŨ ===== */
+        html, body { scrollbar-width: none; -ms-overflow-style: none; }
+        html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --bg-dark: #050b18; --bg-accent: #0a162f; --accent: #00E5FF; --glass-bg: rgba(255, 255, 255, 0.03); --glass-border: rgba(255, 255, 255, 0.12); --text-light: #ffffff; }
+        body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: radial-gradient(circle at 20% 20%, #00E5FF22, transparent 40%), radial-gradient(circle at 80% 80%, #00E5FF22, transparent 40%), linear-gradient(135deg, #020617, #050b18); background-attachment: fixed; color: var(--text-light); min-height: 100vh; overflow-x: hidden; }
+        .container { padding: 40px 5%; max-width: 1200px; margin: 0 auto; text-align: center; }
+        .section-header { margin-bottom: 40px; }
+        .section-title { font-family: 'Montserrat', sans-serif; font-size: 48px !important; font-weight: 800; text-transform: uppercase; letter-spacing: -1px; margin-bottom: 15px; color: #fff; text-shadow: 0 10px 30px rgba(255, 255, 255, 0.2); }
+        .section-title span { font-family: 'Cormorant Garamond', serif; font-style: italic; text-transform: lowercase; font-weight: 600; color: var(--accent); padding-left: 10px; font-size: 56px; }
+        .section-subtitle { font-family: 'Plus Jakarta Sans', sans-serif; color: rgba(255,255,255,0.5); font-size: 16px !important; letter-spacing: 3px; text-transform: uppercase; }
+        .service-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .service-card { background: rgba(255, 255, 255, 0.015) !important; backdrop-filter: blur(40px) saturate(210%) brightness(1.1) !important; -webkit-backdrop-filter: blur(40px) saturate(210%) brightness(1.1); border-radius: 4rem !important; padding: 0 !important; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 3px solid rgba(255, 255, 255, 0.6) !important; border-left: 1.5px solid rgba(255, 255, 255, 0.25) !important; box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), inset 0 1px 4px rgba(255, 255, 255, 0.3), inset 0 -10px 20px rgba(0, 229, 255, 0.05) !important; transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1) !important; }
+        .service-card:hover { transform: translateY(-15px) scale(1.02) !important; background: rgba(255, 255, 255, 0.04) !important; border-top-color: #fff !important; box-shadow: 0 60px 120px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 229, 255, 0.1); }
+        .service-card h3, .service-card p, .service-card .card-footer { padding-left: 25px; padding-right: 25px; }
+        .service-card h3 { margin-top: 20px; font-size: 22px; font-weight: 600; color: #fff; }
+        .service-card p { font-size: 13.5px; color: rgba(255, 255, 255, 0.5); line-height: 1.6; margin-top: 10px; margin-bottom: 15px; text-align: center; }
+        .service-card .card-footer { padding-bottom: 25px; }
+        .price-tag { font-size: 20px; font-weight: 800; color: var(--accent); margin-bottom: 15px; display: block; }
+        .btn-booking { display: block; padding: 12px; border-radius: 1.5rem; background: linear-gradient(135deg, var(--accent), #0072ff); color: #fff; text-decoration: none; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; border-top: 1px solid rgba(255, 255, 255, 0.3); }
+        .btn-booking:hover { filter: brightness(1.1); transform: scale(1.02); }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .service-card { animation: slideIn 0.5s ease backwards; }
+        .why-us-section { padding: 20px 5% 80px; max-width: 1200px; margin: 0 auto; }
+        .why-us-glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(30px) saturate(180%); -webkit-backdrop-filter: blur(30px) saturate(180%); border-radius: 3rem; padding: 50px; border: 1px solid var(--glass-border); border-top: 1.5px solid rgba(255, 255, 255, 0.25); display: grid; grid-template-columns: 1fr 2fr; gap: 40px; align-items: center; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); }
+        .why-us-title-box { text-align: left; border-right: 1px solid rgba(255, 255, 255, 0.1); padding-right: 30px; }
+        .why-us-title-box h2 { font-family: 'Montserrat', sans-serif; font-size: 36px !important; font-weight: 800; line-height: 1.1; }
+        .why-us-title-box h2 span { font-family: 'Cormorant Garamond', serif; font-style: italic; text-transform: lowercase; font-size: 42px; }
+        .why-us-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .feature-item { text-align: left; }
+        .feature-icon { font-size: 24px; color: var(--accent); margin-bottom: 15px; display: block; }
+        .feature-item h4 { font-family: 'Montserrat', sans-serif; font-size: 15px !important; font-weight: 700; margin-bottom: 8px; color: #fff; letter-spacing: 1px; text-transform: uppercase; }
+        .feature-item p { font-size: 12px; color: rgba(255, 255, 255, 0.4); line-height: 1.6; }
+        @media (max-width: 900px) { .why-us-glass { grid-template-columns: 1fr; padding: 30px; } .why-us-title-box { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 20px; } .why-us-features { grid-template-columns: 1fr; } }
+        .reasons-section { padding: 60px 5%; max-width: 1200px; margin: 0 auto; text-align: center; }
+        .reasons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .reason-card { background: rgba(255, 255, 255, 0.01) !important; backdrop-filter: blur(40px) saturate(200%) !important; -webkit-backdrop-filter: blur(40px) saturate(200%); border-radius: 3rem; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 2.5px solid rgba(255, 255, 255, 0.5) !important; border-left: 1.5px solid rgba(255, 255, 255, 0.2) !important; box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.2); overflow: hidden; transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); position: relative; }
+        .reason-card:hover { transform: translateY(-15px) scale(1.02); border-top: 3px solid rgba(255, 255, 255, 0.8) !important; background: rgba(255, 255, 255, 0.04) !important; box-shadow: 0 50px 100px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 229, 255, 0.1); }
+        .reason-img { width: 100%; height: 220px; position: relative; border-bottom: 1px solid rgba(255, 255, 255, 0.1); background: rgba(0, 0, 0, 0.2); }
+        .reason-img img { width: 100%; height: 100%; object-fit: cover; opacity: 0.85; transition: 0.6s; filter: brightness(0.9) contrast(1.1); }
+        .reason-card:hover .reason-img img { transform: scale(1.1); }
+        .reason-text { padding: 30px 20px; background: rgba(255, 255, 255, 0.02); text-align: center; }
+        .reason-text h4 { font-family: 'Montserrat', sans-serif; font-size: 22px !important; font-weight: 800 !important; color: #ffffff !important; text-transform: uppercase; letter-spacing: -0.5px; text-shadow: 0 5px 15px rgba(255, 255, 255, 0.2); margin-bottom: 8px; }
+        .reason-text p { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px !important; color: var(--accent) !important; text-transform: lowercase; text-shadow: 0 0 15px rgba(0, 229, 255, 0.4); }
+        @media (max-width: 900px) { .reasons-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 600px) { .reasons-grid { grid-template-columns: 1fr; } }
+        .trust-badges-section { padding: 40px 5%; max-width: 1200px; margin: 0 auto 80px; }
+        .trust-badges-wrap { background: rgba(255, 255, 255, 0.01) !important; backdrop-filter: blur(50px) saturate(220%) !important; -webkit-backdrop-filter: blur(50px) saturate(220%); border-radius: 5rem; padding: 60px 50px; margin-top: 50px; display: flex; justify-content: space-around; align-items: center; gap: 30px; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 3.5px solid rgba(255, 255, 255, 0.6) !important; border-left: 2px solid rgba(255, 255, 255, 0.3) !important; box-shadow: 0 50px 100px rgba(0, 0, 0, 0.7), inset 0 1px 4px rgba(255, 255, 255, 0.25), inset 0 -10px 30px rgba(0, 229, 255, 0.05); transition: all 0.5s ease; }
+        .trust-badges-wrap:hover { transform: translateY(-8px); background: rgba(255, 255, 255, 0.03) !important; border-top-color: rgba(255, 255, 255, 0.9) !important; box-shadow: 0 60px 120px rgba(0, 0, 0, 0.8); }
+        .badge-item { display: flex; flex-direction: column; align-items: center; gap: 12px; transition: 0.4s; flex: 1; min-width: 150px; }
+        .badge-item:hover { transform: translateY(-5px); }
+        .badge-icon-box { width: 75px; height: 75px; background: rgba(255, 215, 0, 0.1) !important; backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; color: #ffd700; border: 1.5px solid rgba(255, 215, 0, 0.4) !important; box-shadow: 0 0 25px rgba(255, 215, 0, 0.2); margin-bottom: 20px; position: relative; }
+        .badge-icon-box::after { content: ''; position: absolute; inset: -5px; border-radius: 50%; border: 1px dashed rgba(212, 175, 55, 0.2); animation: rotate 10s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .badge-text { text-align: center; }
+        .badge-text h5 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; color: #fff; }
+        .badge-text p { font-size: 11px; color: rgba(255, 255, 255, 0.4); }
+        .card-img-wrap { width: 100%; height: 220px; margin-bottom: 0; position: relative; overflow: hidden; border-radius: 0; border: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.2, 1, 0.3, 1), filter 0.5s ease; filter: brightness(0.9) contrast(1.1); }
+        .service-card:hover .card-img-wrap img { transform: scale(1.12); filter: brightness(1.05) contrast(1.1); }
+        .card-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, rgba(0, 229, 255, 0.15), rgba(5, 11, 24, 1)); font-size: 50px; color: rgba(0, 229, 255, 0.4); text-shadow: 0 0 20px rgba(0, 229, 255, 0.6); }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{header :: header}"></div>
+
+    <div class="container">
+        <header class="section-header">
+            <h2 class="section-title">Dịch vụ <span>Hàng đầu</span></h2>
+            <p class="section-subtitle">Công nghệ hiện đại - Chăm sóc tận tâm</p>
+        </header>
+
+        <div class="service-grid">
+            <div class="service-card" th:each="s, status : ${listS}" th:style="'animation-delay: ' + (${status.index} * 0.08) + 's'">
+                <div class="card-body">
+                    
+                    <div class="card-img-wrap">
+                        <img th:if="${s.serviceImage != null and !#strings.isEmpty(s.serviceImage)}" 
+                             th:src="@{'/' + ${s.serviceImage}}" th:alt="${s.serviceName}" />
+                        
+                        <div th:unless="${s.serviceImage != null and !#strings.isEmpty(s.serviceImage)}" class="card-img-placeholder">🦷</div>
+                    </div>
+
+                    <h3 th:text="${s.serviceName}">Tên dịch vụ</h3>
+                    <p th:text="${s.description}">Mô tả dịch vụ</p>
+                </div>
+
+                <div class="card-footer">
+                    <span class="price-tag" th:text="${#numbers.formatInteger(s.price, 3, 'POINT')} + ' đ'"></span>
+                    
+                    <a th:href="@{/booking(serviceID=${s.serviceID})}" class="btn-booking">Đặt lịch ngay</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="why-us-section">
+        <div class="why-us-glass">
+            <div class="why-us-title-box">
+                <h2>Tại sao<br>nên chọn<br><span>Dental Pro?</span></h2>
+            </div>
+            <div class="why-us-features">
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fa-solid fa-microscope"></i></div>
+                    <h4>Công nghệ 4.0</h4>
+                    <p>Ứng dụng AI và chẩn đoán hình ảnh 3D cho độ chính xác tuyệt đối.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fa-solid fa-user-shield"></i></div>
+                    <h4>An toàn tối đa</h4>
+                    <p>Quy trình vô trùng chuẩn quốc tế, bảo vệ sức khỏe bệnh nhân lên hàng đầu.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                    <h4>Chi phí minh bạch</h4>
+                    <p>Cam kết không phát sinh, hỗ trợ trả góp 0% lãi suất cho mọi dịch vụ.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="reasons-section">
+        <div style="margin-bottom: 40px;">
+            <p style="font-size: 13px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 10px;">Ưu thế vượt trội</p>
+            <h2 style="font-size: 32px; font-weight: 800; text-transform: uppercase;">6 Lý do nên chọn <span>Dental Pro</span></h2>
+        </div>
+
+        <div class="reasons-grid">
+            <div class="reason-card">
+                <div class="reason-img">
+                    <img th:src="@{/assets/Images/phongkham.jpg}" alt="Phòng khám" />
+                </div>
+                <div class="reason-text">
+                    <h4>Chuỗi phòng khám</h4>
+                    <p>toàn quốc</p>
+                </div>
+            </div>
+            <div class="reason-card">
+                <div class="reason-img">
+                    <img th:src="@{/assets/Images/phongcho.jpg}" alt="Phòng chờ" />
+                </div>
+                <div class="reason-text">
+                    <h4>Thăm khám cùng</h4>
+                    <p>chuyên gia hàng đầu</p>
+                </div>
+            </div>
+            <div class="reason-card">
+                <div class="reason-img">
+                    <img th:src="@{/assets/Images/kh.jpg}" alt="Khách hàng" />
+                </div>
+                <div class="reason-text">
+                    <h4>61.000+</h4>
+                    <p>khách hàng tin tưởng</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="trust-badges-section">
+        <div class="trust-badges-wrap">
+            <div class="badge-item">
+                <div class="badge-icon-box"><i class="fa-solid fa-medal"></i></div>
+                <div class="badge-text">
+                    <h5>ISO 9001:2026</h5>
+                    <p>Tiêu chuẩn quốc tế</p>
+                </div>
+            </div>
+            <div class="badge-item">
+                <div class="badge-icon-box"><i class="fa-solid fa-microchip"></i></div>
+                <div class="badge-text">
+                    <h5>Digital Dentistry</h5>
+                    <p>Công nghệ dẫn đầu</p>
+                </div>
+            </div>
+            <div class="badge-item">
+                <div class="badge-icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="badge-text">
+                    <h5>Lifetime Warranty</h5>
+                    <p>Bảo hành trọn đời</p>
+                </div>
+            </div>
+            <div class="badge-item">
+                <div class="badge-icon-box"><i class="fa-solid fa-user-check"></i></div>
+                <div class="badge-text">
+                    <h5>Global Experts</h5>
+                    <p>Bác sĩ tu nghiệp Mỹ</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div th:replace="~{footer :: footer}"></div>
+	<script>
+	        function toggleSearchMenu(event) {
+	            event.stopPropagation();
+	            const searchMenu = document.getElementById('searchDropdown');
+	            const userMenu = document.getElementById('userDropdown');
+	            if (userMenu) userMenu.style.display = 'none';
+	            if (searchMenu) {
+	                searchMenu.style.display = (searchMenu.style.display === 'block') ? 'none' : 'block';
+	            }
+	        }
+
+	        function toggleUserMenu(event) {
+	            event.stopPropagation();
+	            const userMenu = document.getElementById('userDropdown');
+	            const searchMenu = document.getElementById('searchDropdown');
+	            if (searchMenu) searchMenu.style.display = 'none';
+	            if (userMenu) {
+	                userMenu.style.display = (userMenu.style.display === 'block') ? 'none' : 'block';
+	            }
+	        }
+
+	        // Click ra ngoài tự động đóng menu ẩn
+	        window.addEventListener('click', function() {
+	            const searchMenu = document.getElementById('searchDropdown');
+	            const userMenu = document.getElementById('userDropdown');
+	            if (searchMenu) searchMenu.style.display = 'none';
+	            if (userMenu) userMenu.style.display = 'none';
+	        });
+	    </script>
+</body>
+</html>

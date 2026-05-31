@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch hẹn của tôi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ===== TOÀN BỘ CSS LĂNG KÍNH THỦY TINH ĐƯỢC GIỮ NGUYÊN VẸN 100% ===== */
+        :root { 
+            --accent: #00E5FF;
+            --accent-deep: #0072ff;
+            --glass-bg: rgba(255, 255, 255, 0.012); 
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --text-light: #ffffff;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: radial-gradient(circle at 20% 20%, rgba(0, 229, 255, 0.15), transparent 40%), radial-gradient(circle at 80% 80%, rgba(0, 114, 255, 0.1), transparent 40%), linear-gradient(135deg, #020617, #050b18); background-attachment: fixed; color: var(--text-light); min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 80px 20px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        body::-webkit-scrollbar { display: none; }
+        .container { width: 95%; max-width: 900px; padding: 60px; position: relative; background: var(--glass-bg) !important; backdrop-filter: blur(50px) saturate(220%) brightness(1.1) !important; -webkit-backdrop-filter: blur(50px) saturate(220%) brightness(1.1); border-radius: 4rem; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 3px solid rgba(255, 255, 255, 0.6) !important; border-left: 1.5px solid rgba(255, 255, 255, 0.2) !important; box-shadow: 0 60px 120px rgba(0, 0, 0, 0.7), inset 0 1px 4px rgba(255, 255, 255, 0.2); }
+        .glass-header { position: relative; margin-bottom: 50px; text-align: center; }
+        .btn-back-inner { position: absolute; top: 50%; left: 0; transform: translateY(-50%); width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; border-radius: 50%; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px) saturate(180%); -webkit-backdrop-filter: blur(10px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 2px solid rgba(255, 255, 255, 0.6); border-left: 1px solid rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.6); font-size: 16px; text-decoration: none; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.2); transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); z-index: 10; }
+        .btn-back-inner:hover { color: #fff; background: rgba(255, 255, 255, 0.15); transform: translateY(-50%) scale(1.1) rotate(-10deg); border-top-color: #fff; box-shadow: 0 12px 25px rgba(0, 229, 255, 0.2); }
+        h2 { letter-spacing: 5px; font-size: 32px; font-weight: 700; text-transform: uppercase; }
+        .appointment-card { background: rgba(255, 255, 255, 0.03) !important; backdrop-filter: blur(15px); border-radius: 2.5rem; padding: 25px 45px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1.5px solid rgba(255, 255, 255, 0.45); transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+        .appointment-card:hover { transform: scale(1.02) translateX(10px); background: rgba(255, 255, 255, 0.08) !important; border-top-color: var(--accent); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); }
+        .info h3 { color: var(--accent); margin-bottom: 8px; font-size: 20px; text-shadow: 0 0 15px rgba(0, 212, 255, 0.3); text-align: left; }
+        .info p { font-size: 13px; color: rgba(255, 255, 255, 0.6); margin: 4px 0; letter-spacing: 0.5px; text-align: left; }
+        .status { padding: 10px 25px; border-radius: 2rem; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; border-top: 2px solid rgba(255, 255, 255, 0.5); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); }
+        .status.pending { background: linear-gradient(135deg, rgba(255, 193, 7, 0.3), rgba(255, 152, 0, 0.6)); color: #fff; text-shadow: 0 0 10px #ffc107; }
+        .status.confirmed, .status.approved { background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(0, 114, 255, 0.6)); color: #fff; text-shadow: 0 0 10px #00d4ff; }
+        .status.completed { background: linear-gradient(135deg, rgba(40, 167, 69, 0.3), rgba(25, 135, 84, 0.6)); color: #fff; text-shadow: 0 0 10px #28a745; }
+        .status.cancelled { background: linear-gradient(135deg, rgba(255, 77, 77, 0.3), rgba(255, 0, 0, 0.6)); color: #fff; text-shadow: 0 0 10px #ff4d4d; }
+        .empty-state { text-align: center; padding: 80px 20px; background: rgba(255, 255, 255, 0.02); border-radius: 3rem; border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="glass-header">
+            <a href="javascript:history.back()" class="btn-back-inner">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+            <h2>Lịch hẹn <span style="color: var(--accent); text-shadow: 0 0 20px rgba(0,212,255,0.6);">của tôi</span></h2>
+        </div>
+        
+        <div class="appointment-card" th:each="a : ${listApp}">
+            <div class="info">
+                <h3 th:text="${a.serviceName}">Tên dịch vụ</h3>
+                <p><i class="fa-regular fa-calendar-check" style="margin-right: 8px;"></i> Ngày: <span th:text="${a.appointmentDate}">01/01/2026</span></p>
+                <p><i class="fa-regular fa-clock" style="margin-right: 8px;"></i> Giờ: <span th:text="${a.appointmentTime}">08:00</span></p>
+                <p><i class="fa-solid fa-user-doctor" style="margin-right: 8px;"></i> Bác sĩ: <span th:text="${a.dentistName}">Tên bác sĩ</span></p>
+            </div>
+            
+            <div class="status" 
+                 th:classappend="${a.status != null} ? (${#strings.toLowerCase(a.status)} == 'confirmed' ? 'approved' : ${#strings.toLowerCase(a.status)}) : 'pending'"
+                 th:text="${a.status == 'Pending'} ? 'Đang chờ' : 
+                          (${a.status == 'Confirmed' or a.status == 'Approved'} ? 'Đã duyệt' : 
+                          (${a.status == 'Completed'} ? 'Hoàn thành' : 
+                          (${a.status == 'Cancelled'} ? 'Đã hủy' : ${a.status})))">
+                Trạng thái
+            </div>
+        </div>
+        
+        <div th:if="${#lists.isEmpty(listApp)}" class="empty-state">
+            <i class="fa-regular fa-calendar-times" style="font-size: 50px; color: rgba(255,255,255,0.1); margin-bottom: 20px; display: block;"></i>
+            <p style="color: rgba(255,255,255,0.3); letter-spacing: 1px;">Hiện tại bạn chưa có lịch hẹn nào được đăng ký.</p>
+        </div>
+    </div>
+
+</body>
+</html>

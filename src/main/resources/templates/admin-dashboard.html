@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thống kê hệ thống</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <th:block th:replace="~{sidebar :: sidebar-style}"></th:block>
+   
+    <style>
+        /* ===== TOÀN BỘ CSS CHART BOX LIQUID STYLE ĐƯỢC GIỮ NGUYÊN VẸN 100% KHÔNG THAY ĐỔI MỘT CHỮ ===== */
+        :root {
+            --accent:       #00d4ff;
+            --accent-glow:  rgba(0, 212, 255, 0.35);
+            --success:      #34d399;
+            --text:         #ffffff;
+            --text-soft:    rgba(255, 255, 255, 0.6);
+            
+            /* Liquid Glass Config */
+            --glass-bg:     rgba(255, 255, 255, 0.03); 
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-top:    rgba(255, 255, 255, 0.5); /* Viền sáng Header Drop */
+            
+            --shadow-heavy: 0 40px 100px rgba(0, 0, 0, 0.8), 
+                            0 10px 20px rgba(0, 0, 0, 0.5);
+            --inset-shine:  inset 0 1px 2px rgba(255, 255, 255, 0.2);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            background: 
+                radial-gradient(at 0% 0%, rgba(0, 212, 255, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(0, 114, 255, 0.1) 0px, transparent 40%),
+                #04070d;
+            background-attachment: fixed;
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            margin-left: 230px; 
+            padding: 40px 50px;
+            width: calc(100% - 230px);
+        }
+
+        /* ===== HEADER DROP STYLE ===== */
+        .header-section { margin-bottom: 45px; }
+        .header-section h2 { 
+            font-weight: 800; 
+            font-size: 32px; 
+            margin: 0; 
+            letter-spacing: -1px;
+        }
+        .header-section p { color: var(--text-soft); margin-top: 8px; font-size: 15px; }
+
+        /* ===== LIQUID STAT CARDS ===== */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            padding: 30px;
+            border-radius: 35px;
+            border: 1px solid var(--glass-border);
+            border-top: 2px solid var(--glass-top); /* Drop Light Effect */
+            box-shadow: var(--shadow-heavy), var(--inset-shine);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            background: rgba(255, 255, 255, 0.06);
+            border-top-color: var(--accent);
+            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.9), 0 0 20px var(--accent-glow);
+        }
+
+        .stat-card h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--accent);
+            letter-spacing: 2px;
+            margin: 0 0 15px 0;
+            font-weight: 700;
+        }
+
+        .stat-card .value {
+            font-size: 38px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.2);
+        }
+
+        /* ===== CHART BOX LIQUID STYLE ===== */
+        .chart-container {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            gap: 35px;
+        }
+
+        .chart-box {
+            background: var(--glass-bg);
+            backdrop-filter: blur(50px) saturate(200%);
+            padding: 40px;
+            border-radius: 40px;
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid var(--glass-top);
+            box-shadow: var(--shadow-heavy), var(--inset-shine);
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .chart-title i { 
+            color: var(--accent); 
+            filter: drop-shadow(0 0 8px var(--accent-glow));
+        }
+
+        /* Clean Scrollbar */
+        ::-webkit-scrollbar { width: 0px; }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{sidebar :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="header-section">
+            <h2>Hệ thống <span style="color: var(--accent);">Phân tích</span></h2>
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                <div style="width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success);"></div>
+                <p style="margin: 0;">Xin chào, <strong th:text="${session.acc != null} ? ${session.acc.fullName} : 'Admin'">Admin</strong>. Dữ liệu thời gian thực đã sẵn sàng.</p>
+            </div>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-card">
+                <h3>Doanh thu tháng này</h3>
+                <div class="value" style="color: var(--success);"
+                     th:text="${totalRevenue != null} ? ${#numbers.formatInteger(totalRevenue, 3, 'POINT')} + 'đ' : '0đ'">
+                    0đ
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>Tổng bệnh nhân</h3>
+                <div class="value" th:text="${totalPatients != null ? totalPatients : 0}">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Bác sĩ trực</h3>
+                <div class="value" th:text="${totalDoctors != null ? totalDoctors : 0}">0</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-box">
+                <div class="chart-title"><i class="fas fa-chart-line"></i> Tần suất khám bệnh</div>
+                <canvas id="barChart" height="180"></canvas>
+            </div>
+            
+            <div class="chart-box">
+                <div class="chart-title"><i class="fas fa-tasks"></i> Trạng thái đặt lịch</div>
+                <div style="max-width: 250px; margin: auto;">
+                    <canvas id="doughnutChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        // Cấu hình Chart.js với màu sắc Liquid
+        const chartDefaults = {
+            color: 'rgba(255,255,255,0.5)',
+            font: { family: 'Plus Jakarta Sans', size: 12 }
+        };
+        Object.assign(Chart.defaults, chartDefaults);
+
+        // Bốc biến động an toàn từ Spring Model bằng cặp dấu ngoặc vuông kép để tránh lỗi parse
+        const pending = /*[[${pending != null ? pending : 0}]]*/ 0;
+        const confirmed = /*[[${confirmed != null ? confirmed : 0}]]*/ 0;
+        const completed = /*[[${completed != null ? completed : 0}]]*/ 0;
+        const totalAppointments = /*[[${totalAppointments != null ? totalAppointments : 0}]]*/ 0;
+
+        new Chart(document.getElementById('doughnutChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Chờ duyệt', 'Đã xác nhận', 'Hoàn thành'],
+                datasets: [{
+                    data: [pending, confirmed, completed],
+                    backgroundColor: [
+                        'rgba(250, 204, 21, 0.4)', 
+                        'rgba(0, 212, 255, 0.4)', 
+                        'rgba(52, 211, 153, 0.4)'
+                    ],
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 2,
+                    hoverOffset: 20
+                }]
+            },
+            options: {
+                cutout: '78%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 25, usePointStyle: true }
+                    }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Tháng 2', 'Tháng 3', 'Tháng 4'],
+                datasets: [{
+                    label: 'Số ca khám',
+                    data: [12, 19, totalAppointments],
+                    backgroundColor: 'rgba(0, 212, 255, 0.2)',
+                    borderColor: '#00d4ff',
+                    borderWidth: 2,
+                    borderRadius: 15,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                scales: {
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' } },
+                    x: { grid: { display: false } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    </script>
+</body>
+</html>

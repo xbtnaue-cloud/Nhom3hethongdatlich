@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết Quả Tra Cứu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <th:block th:replace="~{header :: header-style}"></th:block>
+
+    <style>
+        :root {
+            --accent: #00d4ff;
+            --accent-deep: #0072ff;
+            --glass: rgba(255, 255, 255, 0.02);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        /* TRIỆT TIÊU THANH CUỘN */
+        html, body { scrollbar-width: none; -ms-overflow-style: none; }
+        body::-webkit-scrollbar { display: none; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at top right, #0a192f, #02060c);
+            min-height: 100vh; color: #fff; overflow-x: hidden;
+        }
+
+        header { max-width: 1200px; margin: 0 auto !important; left: 0; right: 0; }
+
+        .result-container {
+            width: 85%; max-width: 1000px; margin: 60px auto; padding: 30px;
+            background: var(--glass); backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%); border-radius: 35px;
+            border: 1px solid var(--border); border-top: 2px solid rgba(255, 255, 255, 0.4); 
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.7); animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-title { text-align: center; margin-bottom: 30px; }
+        .header-title h2 { font-size: 24px; letter-spacing: 1.5px; text-transform: uppercase; background: linear-gradient(to right, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+
+        .glass-table-wrapper { overflow: visible !important; border-radius: 20px; background: rgba(0, 0, 0, 0.2); }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { padding: 15px 10px; background: rgba(255, 255, 255, 0.03); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); border-bottom: 1px solid var(--border); }
+        td { padding: 15px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; vertical-align: middle; word-wrap: break-word; }
+        tr:hover { background: rgba(255, 255, 255, 0.04); transition: 0.2s; }
+
+        .badge { padding: 5px 10px; border-radius: 50px; font-size: 9px; font-weight: 700; text-transform: uppercase; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .pending { color: #ffc107; border-color: rgba(255, 193, 7, 0.3); }
+        .confirmed { color: var(--accent); border-color: rgba(0, 212, 255, 0.3); }
+        .completed { color: #34d399; border-color: rgba(52, 211, 153, 0.3); }
+        .cancelled { color: #ff4d4d; border-color: rgba(255, 77, 77, 0.3); }
+
+        .empty-state { text-align: center; padding: 30px; }
+        .btn-back { display: inline-block; margin-top: 20px; padding: 10px 25px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); border-top: 1px solid rgba(255, 255, 255, 0.4); border-radius: 50px; color: #fff; text-decoration: none; font-size: 12px; font-weight: 600; transition: 0.3s; }
+        .btn-back:hover { background: var(--accent); box-shadow: 0 0 15px var(--accent); transform: translateY(-2px); }
+        
+        .btn-cancel-trigger { background: rgba(255, 77, 77, 0.1); border: 1px solid rgba(255, 77, 77, 0.3); color: #ff4d4d; padding: 4px 12px; border-radius: 50px; font-size: 10px; cursor: pointer; transition: 0.3s; }
+        .btn-cancel-trigger:hover { background: #ff4d4d; color: #fff; box-shadow: 0 0 10px rgba(255, 77, 77, 0.5); }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        .modal-content { background: #0a192f; border: 1px solid var(--border); border-top: 2px solid rgba(255,255,255,0.4); padding: 30px; border-radius: 30px; width: 350px; box-shadow: 0 50px 100px rgba(0,0,0,0.8); animation: zoomIn 0.3s ease; }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .btn-cancel-submit { background: #ff4d4d; color: #fff; border: none; border-radius: 50px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-cancel-submit:hover { box-shadow: 0 0 20px rgba(255, 77, 77, 0.6); transform: translateY(-2px); }
+
+        #glass-toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; z-index: 10000; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 3px solid #ffc107; border-radius: 20px; padding: 18px 25px; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6); display: flex; align-items: center; gap: 15px; transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+        #glass-toast.show { top: 30px; }
+        #glass-toast .toast-icon { font-size: 24px; color: #ffc107; }
+        #glass-toast .toast-content { color: #fff; font-size: 13px; line-height: 1.5; text-align: left; }
+
+        .btn-exit { position: absolute; top: 25px; left: 25px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px) saturate(180%); -webkit-backdrop-filter: blur(15px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 2px solid rgba(255, 255, 255, 0.5); border-left: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%; color: var(--accent); text-decoration: none; font-size: 16px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.2); transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); z-index: 100; }
+        .btn-exit:hover { background: rgba(255, 255, 255, 0.12); color: #fff; border-top: 2px solid rgba(255, 255, 255, 0.8); box-shadow: 0 0 20px rgba(0, 212, 255, 0.15), 0 15px 30px rgba(0, 0, 0, 0.6), inset 0 1px 4px rgba(255, 255, 255, 0.4); transform: scale(1.1) translateY(-2px); filter: brightness(1.2); }
+
+        .status-wrapper { position: relative; display: inline-flex; justify-content: center; cursor: help; }
+        .reason-tooltip { position: absolute; bottom: 135%; left: 50%; transform: translateX(-50%) translateY(10px); width: 240px; padding: 15px; background: rgba(10, 25, 47, 0.98); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.15); border-top: 2px solid #ff4d4d; border-radius: 18px; color: #fff; font-size: 12px; line-height: 1.5; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.9); pointer-events: none; opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 99999; }
+        .reason-tooltip::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -6px; border-width: 6px; border-style: solid; border-color: rgba(10, 25, 47, 0.98) transparent transparent transparent; }
+        .status-wrapper:hover .reason-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{header :: header}"></div>
+
+    <div class="result-container">
+        <a th:href="@{/index}" class="btn-exit" title="Quay lại trang chủ">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        
+        <div class="header-title">
+            <h2>Trạng thái lịch hẹn</h2>
+            <p style="color: rgba(255,255,255,0.4); font-size: 12px;">Tra cứu cho SĐT: <strong th:text="${searchPhone}">0987xxxxxx</strong></p>
+        </div>
+
+        <div class="glass-table-wrapper">
+            <th:block th:if="${not #lists.isEmpty(listA)}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 18%;"><i class="fa-regular fa-clock"></i> Thời gian</th>
+                            <th style="width: 18%;"><i class="fa-solid fa-user"></i> Bệnh nhân</th>
+                            <th style="width: 22%;"><i class="fa-solid fa-briefcase-medical"></i> Dịch vụ</th>
+                            <th style="width: 22%;"><i class="fa-solid fa-user-doctor"></i> Bác sĩ</th>
+                            <th style="width: 20%; text-align: center;"><i class="fa-solid fa-circle-info"></i> Trạng thái</th>
+                            <th style="width: 15%; text-align: center;"><i class="fa-solid fa-gear"></i> Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="a : ${listA}">
+                            <td>
+                                <div style="font-weight: 700; color: #fff; font-size: 13px;" th:text="${a.appointmentDate}">2026-05-31</div>
+                                <div style="font-size: 10px; color: var(--accent); margin-top: 2px;" th:text="${a.appointmentTime}">08:00:00</div>
+                            </td>
+
+                            <td>
+                                <div style="font-weight: 600; color: #fff; text-transform: uppercase; font-size: 12px;" 
+                                     th:text="${a.patientName != null and !#strings.isEmpty(a.patientName)} ? ${a.patientName} : 'N/A'">Họ tên</div>
+                            </td>
+
+                            <td style="color: rgba(255,255,255,0.7);" th:text="${a.serviceName}">Tên dịch vụ</td>
+                            
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 6px; font-size: 12px;">
+                                    <i class="fa-solid fa-user-doctor" style="color: var(--accent); font-size: 10px;"></i>
+                                    <span th:text="${a.dentistName}">Tên nha sĩ</span>
+                                </div>
+                            </td> 
+                            
+                            <td style="text-align: center;">
+                                <div th:switch="${a.status}">
+                                    <span th:case="'Pending'" class="badge pending">Chờ duyệt</span>
+                                    <span th:case="'Confirmed'" class="badge confirmed">Đã duyệt</span>
+                                    <span th:case="'Completed'" class="badge completed">Hoàn thành</span>
+                                    
+                                    <div th:case="*" class="status-wrapper">
+                                        <span class="badge cancelled">Đã hủy</span>
+                                        <div th:if="${a.notes != null and !#strings.isEmpty(a.notes)}" class="reason-tooltip">
+                                            <div style="color: #ff4d4d; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; font-size: 9px;">
+                                                <i class="fa-solid fa-circle-info"></i> Thông tin từ phòng khám
+                                            </div>
+                                            <span th:text="${a.notes}">Lý do hủy</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            
+							<td style="text-align: center;">
+							    <th:block th:if="${a.status == 'Pending'}">
+							        <button class="btn-cancel-trigger" 
+							                th:onclick="openCancelModal([[${a.appointmentID}]], [[${a.appointmentDate}]], [[${a.serviceName}]])">
+							            Hủy lịch
+							        </button>
+							    </th:block>
+							    
+							    <th:block th:unless="${a.status == 'Pending'}">
+							        <span style="font-size: 11px; opacity: 0.4; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">
+							            <i class="fa-solid fa-lock" style="font-size: 9px; margin-right: 2px;"></i> Khóa hủy
+							        </span>
+							    </th:block>
+							</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </th:block>
+
+            <th:block th:if="${#lists.isEmpty(listA)}">
+                <div class="empty-state">
+                    <i class="fa-solid fa-magnifying-glass-chart" style="font-size: 48px; color: var(--text-soft); margin-bottom: 15px; display: block;"></i>
+                    <p>Không tìm thấy lịch hẹn cho số điện thoại này.</p>
+                    <a th:href="@{/index}" class="btn-back">Quay lại trang chủ</a>
+                </div>
+            </th:block>
+        </div>
+    </div>
+
+
+    <div id="cancelModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="margin-bottom: 5px;">Xác nhận hủy lịch</h3>
+                <p id="cancelInfo" style="font-size: 11px; color: var(--accent); margin-bottom: 15px;"></p>
+                <div style="background: rgba(255,193,7,0.1); padding: 8px; border-radius: 10px; border: 1px solid rgba(255,193,7,0.2);">
+                    <p style="font-size: 10px; color: #ffc107; margin: 0;">
+                        <i class="fa-solid fa-circle-exclamation"></i> Lưu ý: Lịch hẹn chỉ có thể hủy trực tuyến trước 24h.
+                    </p>
+                </div>
+            </div>
+
+            <form th:action="@{/lookup-appointment}" method="POST">
+                <input type="hidden" name="action" value="cancel" />
+                <input type="hidden" name="appointmentID" id="modalAppID" />
+                <input type="hidden" name="searchPhone" th:value="${searchPhone}" />
+                
+                <div style="margin-top: 20px;">
+                    <label style="font-size: 11px; color: rgba(255,255,255,0.6); display: block; margin-bottom: 8px;">
+                        LÝ DO HỦY LỊCH <span style="color: #ff4d4d;">*</span>
+                    </label>
+                    <textarea name="cancelReason" required 
+                              placeholder="Bác sĩ ơi, cho tôi hủy vì..."
+                              style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); 
+                                     border-radius: 15px; color: #fff; padding: 15px; height: 100px; 
+                                     outline: none; font-family: inherit; box-sizing: border-box;
+                                     resize: none; transition: 0.3s;"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 12px; margin-top: 25px;">
+                    <button type="button" class="btn-back" style="margin:0; flex: 1; height: 45px;" onclick="closeCancelModal()">Quay lại</button>
+                    <button type="submit" class="btn-cancel-submit">Xác nhận hủy</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="glass-toast">
+        <div class="toast-icon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="toast-content" id="toast-message"></div>
+    </div>
+
+    <script th:inline="javascript">
+    function openCancelModal(id, appDateStr, serviceName) {
+        const appointmentDate = new Date(appDateStr);
+        const now = new Date();
+        const diffInMs = appointmentDate - now;
+        const diffInHours = diffInMs / (1000 * 60 * 60);
+
+        if (diffInHours < 24) {
+            // Hiển thị thông báo trượt Toast nếu nhỏ hơn 24h
+            const toast = document.getElementById('glass-toast');
+            const msg = document.getElementById('toast-message');
+            
+            msg.innerHTML = "<strong>⚠️ Không thể hủy trực tuyến!</strong><br>Thời gian còn lại ít hơn 24 giờ. Vui lòng gọi Hotline để được hỗ trợ.";
+            
+            toast.classList.add('show');
+
+            // Tự động kéo ẩn sau 5 giây
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 5000);
+
+        } else {
+            // Hợp lệ thì gán dữ liệu mở Modal lên cấu trúc
+            document.getElementById('modalAppID').value = id;
+            document.getElementById('cancelInfo').innerText = serviceName + " | Ngày: " + appDateStr;
+            document.getElementById('cancelModal').style.display = 'flex';
+        }
+    }
+    
+    function closeCancelModal() {
+        document.getElementById('cancelOverlay').classList.remove('open');
+        document.getElementById('cancelModal').style.display = 'none';
+    }
+
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('cancelModal');
+        if (event.target == modal) {
+            closeCancelModal();
+        }
+        
+        const searchMenu = document.getElementById('searchDropdown');
+        const userMenu = document.getElementById('userDropdown');
+        if (searchMenu) searchMenu.style.display = 'none';
+        if (userMenu) userMenu.style.display = 'none';
+    });
+	
+	// 🌟 Tìm đến hàm openCancelModal dưới đáy file và dán đè đoạn check này vào:
+	function openCancelModal(id, appDateStr, serviceName, currentStatus) {
+	    // 🛡️ CHỐT CHẶN BẢO MẬT TUYỆT ĐỐI: Nếu trạng thái không phải Pending thì báo lỗi lập tức
+	    if (currentStatus !== 'Pending') {
+	        const toast = document.getElementById('glass-toast');
+	        const msg = document.getElementById('toast-message');
+	        msg.innerHTML = "<strong>❌ Thao tác không hợp lệ!</strong><br>Lịch hẹn đã được phòng khám xử lý duyệt, không thể hủy trực tuyến.";
+	        toast.classList.add('show');
+	        setTimeout(() => { toast.classList.remove('show'); }, 4000);
+	        return;
+	    }
+
+	    // Logic kiểm tra 24h cũ của ní giữ nguyên vẹn bên dưới...
+	    const appointmentDate = new Date(appDateStr);
+	    const now = new Date();
+	    const diffInMs = appointmentDate - now;
+	    const diffInHours = diffInMs / (1000 * 60 * 60);
+
+	    if (diffInHours < 24) {
+	        const toast = document.getElementById('glass-toast');
+	        const msg = document.getElementById('toast-message');
+	        msg.innerHTML = "<strong>⚠️ Không thể hủy trực tuyến!</strong><br>Thời gian còn lại ít hơn 24 giờ. Vui lòng gọi Hotline để được hỗ trợ.";
+	        toast.classList.add('show');
+	        setTimeout(() => { toast.classList.remove('show'); }, 5000);
+	    } else {
+	        document.getElementById('modalAppID').value = id;
+	        document.getElementById('cancelInfo').innerText = serviceName + " | Ngày: " + appDateStr;
+	        document.getElementById('cancelModal').style.display = 'flex';
+	    }
+	}
+    </script>
+</body>
+</html>

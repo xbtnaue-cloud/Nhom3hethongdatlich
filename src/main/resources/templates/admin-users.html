@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý người dùng</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <th:block th:replace="~{sidebar :: sidebar-style}"></th:block>
+
+    <style>
+        /* ===== TOÀN BỘ CSS LĂNG KÍNH THỦY TINH ĐƯỢC GIỮ NGUYÊN VẸN 100% ===== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { scrollbar-width: none; -ms-overflow-style: none; }
+        html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; background: transparent !important; }
+        
+        :root {
+            --accent: #00d4ff; --accent-glow: rgba(0, 212, 255, 0.35); --accent-deep: #0072ff; --success: #34d399; --warning: #facc15; --danger: #ff6b6b;
+            --glass-bg: rgba(15, 23, 42, 0.25); --glass-border: rgba(255, 255, 255, 0.08); --glass-top: rgba(255, 255, 255, 0.45); --glass-left: rgba(255, 255, 255, 0.2);
+            --text: #ffffff; --text-soft: rgba(255, 255, 255, 0.6); --shadow-heavy: 0 40px 100px rgba(0, 0, 0, 0.8), 0 10px 20px rgba(0, 0, 0, 0.5); --inset-shine: inset 0 1px 1px rgba(255, 255, 255, 0.3);
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; background: radial-gradient(at 0% 0%, rgba(0, 212, 255, 0.2) 0px, transparent 45%), radial-gradient(at 100% 0%, rgba(0, 114, 255, 0.15) 0px, transparent 40%), #04070d; background-attachment: fixed; color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; position: relative; }
+        body::before { content: ""; position: fixed; top: -20%; left: -20%; width: 140%; height: 140%; background: radial-gradient(circle, rgba(0, 212, 255, 0.04) 0%, transparent 60%); animation: liquidMove 20s infinite alternate ease-in-out; z-index: -1; pointer-events: none; }
+        @keyframes liquidMove { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-10%, -5%) scale(1.1); } }
+
+        .main-content { margin-left: 230px; padding: 40px; width: calc(100% - 250px); flex-grow: 1; }
+        .glass-card { background: var(--glass-bg); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%); border-radius: 35px; border: 1px solid var(--glass-border); border-top: 2px solid var(--glass-top); border-left: 1px solid var(--glass-left); padding: 20px; box-shadow: var(--shadow-heavy), var(--inset-shine); overflow: visible; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; padding: 15px; color: var(--accent); font-size: 12px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 14px; vertical-align: middle; }
+        .status-active { color: var(--success); background: rgba(52, 211, 153, 0.1); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .status-locked { color: var(--danger); background: rgba(255, 107, 107, 0.1); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+
+        .btn-action { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 10px; text-decoration: none; transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1); border: 1px solid rgba(255,255,255,0.1); color: #fff; margin-right: 5px; cursor: pointer; }
+        .btn-edit { background: rgba(255, 255, 255, 0.05); }
+        .btn-edit:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+        
+        /* CSS cho các trạng thái nút khóa linh hoạt */
+        .btn-lock { background: rgba(255, 107, 107, 0.1); color: var(--danger); border-color: rgba(255,107,107,0.15); }
+        .btn-lock:hover { background: var(--danger); color: #fff; transform: translateY(-2px); box-shadow: 0 0 10px rgba(255,107,107,0.4); }
+        .btn-unlock { background: rgba(52, 211, 153, 0.1); color: var(--success); border-color: rgba(52, 211, 153, 0.15); }
+        .btn-unlock:hover { background: var(--success); color: #000; transform: translateY(-2px); box-shadow: 0 0 10px rgba(52, 211, 153, 0.4); }
+
+        .btn-booking { display: inline-flex; align-items: center; gap: 10px; padding: 12px 25px; border-radius: 2.5rem; text-decoration: none; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); background: rgba(255, 255, 255, 0.03) !important; backdrop-filter: blur(15px) saturate(180%) brightness(1.1); -webkit-backdrop-filter: blur(15px) saturate(180%) brightness(1.1); border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 2px solid rgba(255, 255, 255, 0.5) !important; border-left: 1px solid rgba(255, 255, 255, 0.2) !important; color: #ffffff !important; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.3), inset 0 -5px 15px rgba(255, 255, 255, 0.02); }
+        .btn-booking:hover { background: rgba(255, 255, 255, 0.1) !important; border-top-color: rgba(255, 255, 255, 0.9) !important; transform: translateY(-3px) scale(1.02); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 255, 255, 0.15), inset 0 1px 4px rgba(255, 255, 255, 0.4); color: #fff !important; }
+        .btn-booking:active { transform: translateY(-1px) scale(0.98); box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3); }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 20, 30, 0.4); backdrop-filter: blur(15px) saturate(160%); display: none; justify-content: center; align-items: center; z-index: 2000; transition: all 0.4s ease; }
+        .modal-content { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(50px) saturate(210%); -webkit-backdrop-filter: blur(50px) saturate(210%); width: 500px; padding: 40px; border-radius: 40px; border: 1px solid rgba(255, 255, 255, 0.1); border-top: 2px solid rgba(255, 255, 255, 0.5); border-left: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 50px 100px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.2); animation: modalSpring 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes modalSpring { from { opacity: 0; transform: scale(0.8) translateY(30px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        
+        .modal-header h3 { font-size: 22px; color: #fff; margin-bottom: 25px; text-align: center; }
+        .form-group { margin-bottom: 22px; text-align: left; }
+        .form-group label { display: block; font-size: 11px; color: var(--accent); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .form-group input, .form-group select { width: 100%; padding: 14px 20px; border-radius: 2.5rem; background: rgba(255, 255, 255, 0.015) !important; backdrop-filter: blur(15px) saturate(180%) brightness(1.1); -webkit-backdrop-filter: blur(15px) saturate(180%) brightness(1.1); border: 1px solid rgba(255, 255, 255, 0.08); border-top: 1.5px solid rgba(255, 255, 255, 0.4); border-left: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; font-size: 13px; font-weight: 500; outline: none; transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.15); }
+        .form-group input:focus, .form-group select:focus { background: rgba(255, 255, 255, 0.08) !important; border-top-color: var(--accent) !important; border-left-color: rgba(0, 212, 255, 0.3); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 15px var(--accent-glow), inset 0 1px 4px rgba(255, 255, 255, 0.4); }
+        .form-group select option { background: #0a1628; color: #fff; }
+        
+        .modal-footer { display: flex; gap: 15px; margin-top: 35px; align-items: center; }
+        .btn-modal { flex: 1; padding: 14px 25px; border-radius: 2.5rem; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); display: flex; align-items: center; justify-content: center; gap: 8px; outline: none; }
+        .btn-cancel { background: rgba(255, 255, 255, 0.03) !important; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 1.5px solid rgba(255, 255, 255, 0.3) !important; color: rgba(255, 255, 255, 0.6) !important; }
+        .btn-cancel:hover { background: rgba(255, 255, 255, 0.08) !important; color: #fff !important; border-top-color: rgba(255, 255, 255, 0.6) !important; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); }
+        .btn-save { background: var(--accent) !important; border: none !important; color: #000 !important; box-shadow: 0 10px 25px var(--accent-glow); }
+        .btn-save:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 35px var(--accent-glow), 0 0 15px rgba(0, 212, 255, 0.4); }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{sidebar :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="page-header" style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2>Quản lý phân quyền</h2>
+                <p style="color: rgba(255,255,255,0.4); font-size: 13px;">Quản lý vai trò và tạo mới tài khoản nội bộ.</p>
+            </div>
+            <button class="btn-booking" style="padding: 12px 25px; font-size: 13px;" onclick="openAddModal()">
+                <i class="fa-solid fa-user-plus"></i> Thêm tài khoản
+            </button>
+        </div>
+
+        <div class="glass-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">ID</th>
+                        <th>Họ tên / Username</th>
+                        <th>Số điện thoại</th>
+                        <th>Vai trò</th>
+                        <th>Trạng thái</th>
+                        <th style="text-align: right; padding-right: 20px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <tr th:each="u : ${listU}" th:id="'user-row-' + ${u.userID}">
+                        <td><span style="color: rgba(255,255,255,0.3)" th:text="'#' + ${u.userID}">#1</span></td>
+                        <td>
+                            <div style="font-weight: 700;" th:text="${u.fullName}">Họ tên</div>
+                            <div style="font-size: 11px; color: var(--accent); opacity: 0.7;" th:text="'@' + ${u.username}">@username</div>
+                        </td>
+                        <td><span style="font-family: monospace;" th:text="${u.phone}">09xxxxxxxx</span></td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;" 
+                                 th:styleappend="'color: ' + (${u.roleID == 1} ? '#ffcc00' : (${u.roleID == 2} ? '#00d4ff' : '#fff'))">
+                                <i class="fa-solid" th:classappend="${u.roleID == 1} ? 'fa-user-shield' : (${u.roleID == 2} ? 'fa-user-doctor' : 'fa-user')" style="font-size: 12px;"></i>
+                                <span style="font-weight: 600; font-size: 13px;" 
+                                      th:text="${u.roleID == 1} ? 'Admin' : (${u.roleID == 2} ? 'Nha sĩ' : 'Bệnh nhân')">Vai trò</span>
+                            </div>
+                        </td>
+                        
+                        <td>
+                            <span th:id="'status-badge-' + ${u.userID}" 
+                                  th:class="${u.statusID == 1} ? 'status-active' : 'status-locked'"
+                                  th:text="${u.statusID == 1} ? 'Hoạt động' : 'Đã khóa'">Trạng thái</span>
+                        </td>
+                        
+                        <td style="text-align: right; padding-right: 10px;">
+                            <button class="btn-action btn-edit" 
+                                    th:onclick="openEditModal([[${u.userID}]], [[${u.username}]], [[${u.fullName}]], [[${u.email}]], [[${u.phone}]], [[${u.roleID}]])">
+                                <i class="fa-solid fa-user-gear"></i>
+                            </button>
+                                
+                            <button th:id="'lock-btn-' + ${u.userID}"
+                                    th:class="'btn-action ' + (${u.statusID == 1} ? 'btn-lock' : 'btn-unlock')"
+                                    th:onclick="'toggleUserStatus(' + ${u.userID} + ')'"
+                                    th:title="${u.statusID == 1} ? 'Khóa' : 'Mở khóa'">
+                                <i class="fa-solid" th:classappend="${u.statusID == 1} ? 'fa-lock' : 'fa-lock-open'"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    <tr th:if="${#lists.isEmpty(listU)}">
+                        <td colspan="6" style="text-align: center; color: rgba(255,255,255,0.3); padding: 40px 0;">Hệ thống chưa ghi nhận tài khoản người dùng nào.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div id="addModal" class="modal-overlay">
+        <div class="modal-content" style="width: 500px;">
+            <div class="modal-header">
+                <h3>Tạo tài khoản mới</h3>
+            </div>
+            <form th:action="@{/add-user}" method="POST">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Tài khoản</label>
+                        <input type="text" name="username" required placeholder="Tên đăng nhập">
+                    </div>
+                    <div class="form-group">
+                        <label>Mật khẩu</label>
+                        <input type="password" name="password" required placeholder="******">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Họ và tên</label>
+                    <input type="text" name="fullName" required placeholder="Nguyễn Văn A">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" placeholder="email@gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <input type="text" name="phone" placeholder="0987xxxxxx">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Vai trò hệ thống</label>
+                    <select name="roleID">
+                        <option value="3">Bệnh nhân (Mặc định)</option>
+                        <option value="2">Nha sĩ</option>
+                        <option value="1">Quản trị viên</option>
+                    </select>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-modal btn-cancel" onclick="closeAddModal()">Hủy</button>
+                    <button type="submit" class="btn-modal btn-save">Tạo tài khoản</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal-overlay">
+        <div class="modal-content" style="width: 500px;">
+            <div class="modal-header">
+                <h3>Chỉnh sửa và Phân quyền</h3>
+            </div>
+            <form th:action="@{/update-user-admin}" method="POST">
+                <input type="hidden" name="id" id="editUserId">
+                
+                <div class="form-group">
+                    <label>Tài khoản</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="editUserAccount" readonly style="flex: 1; opacity: 0.6; background: rgba(255,255,255,0.02);">
+                        <button type="button" onclick="resetPassword()" class="btn-action" style="width: auto; padding: 0 15px; background: rgba(255,204,0,0.1); color: #ffcc00; border-color: #ffcc00;" title="Đặt lại mật khẩu về 123456">
+                            <i class="fa-solid fa-key"></i> Reset MK
+                        </button>
+                    </div>
+                    <small id="resetMsg" style="display:none; color: #ffcc00; font-size: 10px; margin-top: 5px;">Mật khẩu sẽ được đặt lại thành: 123456</small>
+                    <input type="hidden" name="isReset" id="isResetInput" value="false">
+                </div>
+
+                <div class="form-group">
+                    <label>Họ và tên</label>
+                    <input type="text" name="fullName" id="editFullName" required>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" id="editEmail">
+                    </div>
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <input type="text" name="phone" id="editPhone">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Vai trò hệ thống</label>
+                    <select name="roleID" id="editUserRole">
+                        <option value="1">Quản trị viên</option>
+                        <option value="2">Nha sĩ</option>
+                        <option value="3">Bệnh nhân</option>
+                    </select>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-modal btn-cancel" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn-modal btn-save">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        // 🌟 BƯỚC THAY THẾ CHÍNH: Hàm AJAX đảo trạng thái Khóa/Mở khóa ngầm cực mượt
+        function toggleUserStatus(userId) {
+            const btn = document.getElementById('lock-btn-' + userId);
+            const badge = document.getElementById('status-badge-' + userId);
+            if (!btn || !badge) return;
+
+            // Kiểm tra trạng thái hiện tại dựa trên class để gán target status gửi đi
+            const isCurrentlyActive = btn.classList.contains('btn-lock');
+            const targetStatus = isCurrentlyActive ? 0 : 1; 
+            const confirmText = isCurrentlyActive ? 'Khóa tài khoản này?' : 'Mở khóa tài khoản này?';
+
+            if (!confirm(confirmText)) return;
+
+            // Bắn Fetch API ngầm lên Spring Controller Mapping `/user-status`
+            fetch('user-status?id=' + userId + '&status=' + targetStatus)
+                .then(response => {
+                    if (response.ok) {
+                        if (targetStatus === 0) {
+                            // Đảo phom sang trạng thái ĐÃ KHÓA
+                            badge.className = 'status-locked';
+                            badge.textContent = 'Đã khóa';
+                            
+                            btn.className = 'btn-action btn-unlock';
+                            btn.setAttribute('title', 'Mở khóa');
+                            btn.innerHTML = '<i class="fa-solid fa-lock-open"></i>';
+                        } else {
+                            // Đảo phom sang trạng thái HOẠT ĐỘNG
+                            badge.className = 'status-active';
+                            badge.textContent = 'Hoạt động';
+                            
+                            btn.className = 'btn-action btn-lock';
+                            btn.setAttribute('title', 'Khóa');
+                            btn.innerHTML = '<i class="fa-solid fa-lock"></i>';
+                        }
+                    } else {
+                        alert('❌ Cập nhật thất bại từ hệ thống!');
+                    }
+                })
+                .catch(err => {
+                    console.error('Lỗi AJAX:', err);
+                    alert('❌ Không thể kết nối ngầm tới Server!');
+                });
+        }
+
+        function openEditModal(id, username, name, email, phone, role) {
+            document.getElementById('editUserId').value = id;
+            document.getElementById('editUserAccount').value = username; 
+            document.getElementById('editFullName').value = name;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editPhone').value = phone;
+            document.getElementById('editUserRole').value = role;
+            
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+            document.getElementById('isResetInput').value = "false";
+            document.getElementById('resetMsg').style.display = "none";
+        }
+
+        function openAddModal() {
+            document.getElementById('addModal').style.display = 'flex';
+        }
+        
+        function closeAddModal() {
+            document.getElementById('addModal').style.display = 'none';
+        }
+        
+        function resetPassword() {
+            if(confirm("Bạn có muốn đặt lại mật khẩu của người dùng này về mặc định (123456) không?")) {
+                document.getElementById('isResetInput').value = "true";
+                document.getElementById('resetMsg').style.display = "block";
+                alert("Đã chọn Reset. Bấm 'Lưu thay đổi' để hoàn tất.");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+
+            if (status === 'addSuccess') {
+                alert('🎉 Thêm người dùng mới thành công!');
+            } else if (status === 'existed') {
+                alert('⚠️ Tên tài khoản đã tồn tại trên hệ thống!');
+            } else if (status === 'addError') {
+                alert('❌ Có lỗi xảy ra khi thêm dữ liệu!');
+            }
+        });
+
+        window.addEventListener('click', function(event) {
+            let editModal = document.getElementById('editModal');
+            let addModal = document.getElementById('addModal');
+            if (event.target == editModal) closeModal();
+            if (event.target == addModal) closeAddModal();
+            
+            const searchMenu = document.getElementById('searchDropdown');
+            const userMenu = document.getElementById('userDropdown');
+            if (searchMenu) searchMenu.style.display = 'none';
+            if (userMenu) userMenu.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

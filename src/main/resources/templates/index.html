@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chăm Sóc Nụ Cười</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Cormorant+Garamond:italic,wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+    <th:block th:replace="~{header :: header-style}"></th:block>
+	<th:block th:replace="~{footer :: footer-style}"></th:block>
+
+    <style>
+        /* ===== TOÀN BỘ CSS BODY & NỀN DEEP OCEAN ĐƯỢC GIỮ NGUYÊN ===== */
+        html, body { scrollbar-width: none; -ms-overflow-style: none; }
+        html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; background: transparent !important; }
+        
+        body { 
+            margin: 0; padding: 0; font-family: 'Poppins', sans-serif; 
+            background: radial-gradient(circle at 20% 20%, #00E5FF22, transparent 40%),
+                        radial-gradient(circle at 80% 80%, #00E5FF22, transparent 40%),
+                        linear-gradient(135deg, #020617, #050b18);
+            background-attachment: fixed; color: #ffffff; min-height: 100vh; overflow-x: hidden;
+        }
+        .hero { flex: 1; display: flex; justify-content: center; align-items: center; padding: 40px; }
+        .hero-card-wide { width: 100%; max-width: 1100px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); border-radius: 4rem; padding: 60px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; border: 1px solid rgba(255, 255, 255, 0.1); border-top: 2px solid rgba(255, 255, 255, 0.3); box-shadow: 0 50px 100px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden; }
+        .hero-content { text-align: left; }
+        .hero-badge { display: inline-block; padding: 6px 15px; background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: 20px; font-size: 11px; letter-spacing: 2px; color: #00E5FF; text-transform: uppercase; margin-bottom: 20px; }
+        .hero-content h1 { font-family: 'Montserrat', sans-serif; font-size: 58px; font-weight: 800; line-height: 1.1; margin-bottom: 25px; text-align: left; color: #ffffff; text-transform: uppercase; letter-spacing: -1px; }
+        .hero-content h1 em { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 600; text-transform: lowercase; color: #00E5FF; letter-spacing: 2px; position: relative; padding: 0 10px; text-shadow: 0 0 20px rgba(0, 229, 255, 0.4); }
+        .hero-content p { text-align: left; margin-bottom: 40px; max-width: 500px; color: rgba(255, 255, 255, 0.7); line-height: 1.8; }
+        .hero-actions { display: flex; gap: 15px; justify-content: flex-start; width: 100%; }
+        .btn-booking { display: inline-block; padding: 18px 45px; background: linear-gradient(135deg, #00d4ff 0%, #0072ff 100%); color: #fff; text-decoration: none; border-radius: 2.5rem; font-weight: 600; font-size: 16px; letter-spacing: 2px; transition: all 0.4s ease; text-transform: uppercase; border-top: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 10px 25px rgba(0, 114, 255, 0.4); }
+        .btn-booking:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 15px 35px rgba(0, 212, 255, 0.6); filter: brightness(1.1); }
+        .btn-ghost { background: rgba(255, 255, 255, 0.03) !important; backdrop-filter: blur(15px) saturate(180%) brightness(1.1) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 2px solid rgba(255, 255, 255, 0.5) !important; border-left: 1px solid rgba(255, 255, 255, 0.2) !important; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.3) !important; color: #ffffff !important; }
+        .btn-ghost:hover { background: rgba(255, 255, 255, 0.08) !important; border-top-color: rgba(255, 255, 255, 0.8) !important; transform: translateY(-4px) scale(1.03) !important; }
+        .hero-image-box { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; min-height: 450px; border-radius: 4rem; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); border-top: 2px solid rgba(255, 255, 255, 0.3); box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5); -webkit-mask-image: linear-gradient(to right, black 70%, transparent 100%), linear-gradient(to bottom, black 70%, transparent 100%); mask-image: linear-gradient(to right, black 70%, transparent 100%), linear-gradient(to bottom, black 70%, transparent 100%); }
+        .image-inner { width: 100%; height: 100%; }
+        .image-inner img { width: 100%; height: 100%; object-fit: cover; display: block; filter: contrast(1.1) brightness(0.9); }
+        .image-glow { position: absolute; width: 450px; height: 450px; background: radial-gradient(circle, rgba(0, 229, 255, 0.15), transparent 70%); z-index: -2; top: 50%; left: 50%; transform: translate(-50%, -50%); filter: blur(60px); }
+        .hero-stats { display: flex; justify-content: center; gap: 30px; width: 100%; margin-top: 30px; padding-bottom: 30px; position: relative; z-index: 10; }
+        .stat-glass-box { min-width: 200px; padding: 35px 25px; text-align: center; background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(30px) saturate(160%); border-radius: 3rem; border: 1px solid rgba(255, 255, 255, 0.08); border-top: 2px solid rgba(255, 255, 255, 0.3); border-left: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5); transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
+        .stat-glass-box:hover { transform: translateY(-10px) scale(1.05); background: rgba(255, 255, 255, 0.05); border-top-color: #00E5FF; }
+        .stat-num { font-family: 'Montserrat', sans-serif; font-size: 42px; font-weight: 800; color: #ffffff; display: block; line-height: 1; margin-bottom: 12px; text-shadow: 0 0 20px rgba(0, 229, 255, 0.3); }
+        .stat-num span { color: #00E5FF; font-size: 24px; margin-left: 2px; }
+        .stat-label { font-size: 11px; color: rgba(255, 255, 255, 0.5); letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
+        .services-section { padding: 80px 60px; max-width: 1300px; margin: 0 auto; }
+        .services-glass-wrap { background: rgba(255, 255, 255, 0.01) !important; backdrop-filter: blur(45px) saturate(210%) !important; border-radius: 4rem; padding: 100px 60px; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 3px solid rgba(255, 255, 255, 0.6) !important; box-shadow: 0 60px 120px rgba(0, 0, 0, 0.7); text-align: center; }
+        .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-top: 50px; }
+        .service-card { background: rgba(255, 255, 255, 0.02) !important; backdrop-filter: blur(40px) saturate(180%) !important; border-radius: 3.5rem; padding: 50px 40px; position: relative; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.15) !important; border-top: 2px solid rgba(255, 255, 255, 0.6) !important; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); }
+        .service-card:hover { transform: translateY(-15px); background: rgba(255, 255, 255, 0.08) !important; border-top: 3px solid rgba(255, 255, 255, 0.9) !important; }
+        .dr-img-wrap { width: 100%; aspect-ratio: 4 / 5; margin-bottom: 25px; border-radius: 2rem; overflow: hidden; position: relative; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .dr-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .services-title { font-family: 'Montserrat', sans-serif; font-size: 60px; font-weight: 800; color: #ffffff; margin-bottom: 30px; text-transform: uppercase; }
+        .services-title em { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 600; font-size: 80px; color: #00E5FF; text-transform: lowercase; }
+        .services-sub { font-size: 18px; color: rgba(255, 255, 255, 0.7); max-width: 700px; margin: 0 auto; line-height: 1.8; }
+        .services-kicker { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #00E5FF; margin-bottom: 20px; display: block; }
+        
+        /* CHATBOT & OTHERS */
+        .dental-chatbot-launcher { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); backdrop-filter: blur(25px); border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.1); border-top: 2px solid rgba(255, 255, 255, 0.3); cursor: pointer; z-index: 9999; color: #fff; font-size: 24px; }
+        .chat-window-small { position: fixed; bottom: 110px; right: 30px; width: 340px; height: 430px; display: none; flex-direction: column; z-index: 9998; background: rgba(255, 255, 255, 0.015) !important; backdrop-filter: blur(45px) saturate(210%) brightness(1.1) !important; border-radius: 35px; border: 1px solid rgba(255, 255, 255, 0.12) !important; border-top: 3px solid rgba(255, 255, 255, 0.6) !important; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7); overflow: hidden; }
+        .chat-header { padding: 20px; background: rgba(255, 255, 255, 0.03); border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; }
+        .chat-header span { font-weight: 700; font-size: 14px; color: #00E5FF; }
+        .chat-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none; }
+        .chat-bubble { padding: 12px 18px; border-radius: 22px; font-size: 13px; line-height: 1.5; backdrop-filter: blur(15px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); }
+        .chat-bubble.bot { background: rgba(255, 255, 255, 0.05) !important; color: #fff; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .chat-bubble.user { background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 114, 255, 0.15)) !important; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .chat-footer { padding: 15px; display: flex; gap: 10px; }
+        .chat-footer input { flex: 1; height: 42px; padding: 0 22px; background: rgba(255, 255, 255, 0.05) !important; border-radius: 2.5rem !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: #fff; outline: none; }
+        .chat-footer button { background: linear-gradient(135deg, #00E5FF, #0072ff) !important; border: none; width: 42px; height: 42px; border-radius: 50%; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .close-chat { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; }
+        .message-wrapper { display: flex; align-items: flex-end; gap: 8px; max-width: 90%; }
+        .message-wrapper.user { flex-direction: row-reverse; align-self: flex-end; }
+        .message-wrapper.bot { align-self: flex-start; }
+        .chat-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+        .chat-notif-badge { position: absolute; top: -5px; right: -5px; background: #ff3b30; color: white; font-size: 12px; font-weight: bold; width: 22px; height: 22px; border-radius: 50%; display: none; align-items: center; justify-content: center; }
+        
+        .doctors-section, .process-section, .facilities-section, .awards-section, .cta-section { padding: 80px 60px; max-width: 1300px; margin: 0 auto; text-align: center; }
+        .doctors-title, .cta-title { font-family: 'Cormorant Garamond', serif; font-size: 56px; color: #fff; }
+        .doctors-title em, .cta-title em { color: #00E5FF; font-style: italic; }
+        .doctors-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; }
+        .dr-card { background: rgba(255, 255, 255, 0.02) !important; backdrop-filter: blur(35px) saturate(180%) !important; border-radius: 3rem; padding: 25px; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 2.5px solid rgba(255, 255, 255, 0.5) !important; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; }
+        .dr-name { font-size: 18px; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; color: #fff; }
+        .dr-title { font-size: 13px; color: #00E5FF; text-transform: uppercase; }
+        .dr-detail-wrap, .facilities-wrap, .process-wrap, .awards-glass-wrap, .cta-wrap { background: rgba(255, 255, 255, 0.01) !important; backdrop-filter: blur(50px) saturate(200%) !important; border-radius: 4rem; padding: 60px; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 3px solid rgba(255, 255, 255, 0.6) !important; box-shadow: 0 60px 120px rgba(0, 0, 0, 0.7); }
+		.dr-detail-wrap {
+		    /* Đảm bảo khung này không bị dàn quá rộng */
+		    width: 81%;         /* Độ rộng linh hoạt trên mobile */
+		    max-width: 1100px;  /* Không vượt quá 1100px */
+		    margin: 0 auto;     /* Căn giữa màn hình */
+		    
+		    /* Giữ nguyên các thuộc tính Liquid Glass */
+		    background: rgba(255, 255, 255, 0.01) !important;
+		    backdrop-filter: blur(50px) saturate(200%) !important;
+		    border-radius: 4rem;
+		    padding: 60px;
+		    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+		    border-top: 3px solid rgba(255, 255, 255, 0.6) !important;
+		    box-shadow: 0 60px 120px rgba(0, 0, 0, 0.7);
+			/* 🌟 THÊM DÒNG NÀY ĐỂ ÉP NÓ LUÔN NGANG (Không tự xuống dòng) */
+			    display: grid !important;
+			    grid-template-columns: 1fr 1fr !important; 
+			    gap: 40px !important; /* Thu nhỏ gap lại nếu khung hẹp */
+			    align-items: center;
+		}
+		
+        .dr-detail-left { position: relative; min-height: 450px; border-radius: 4rem; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.15); }
+        .dr-detail-img { width: 100%; height: 100%; object-fit: cover; }
+        .dr-detail-name { font-size: 38px; font-weight: 700; text-transform: uppercase; color: #fff; margin: 0 0 10px 0; }
+        .dr-detail-badge { color: #00E5FF; font-weight: 600; font-size: 14px; margin-bottom: 25px; text-transform: uppercase; }
+        .dr-detail-desc { font-size: 15px; color: rgba(255, 255, 255, 0.6); line-height: 1.8; text-align: left; }
+        .dr-cert-title { font-size: 14px; font-weight: 600; color: #fff; text-transform: uppercase; margin: 20px 0; text-align: left; }
+        .dr-cert-list { list-style: none; padding: 0; text-align: left; }
+        .dr-cert-list li { position: relative; padding-left: 25px; margin-bottom: 15px; font-size: 14px; color: rgba(255, 255, 255, 0.5); }
+        .dr-cert-list li::before { content: '▪'; position: absolute; left: 0; color: #00E5FF; }
+        .dr-certs-thumbs { display: flex; gap: 15px; margin-top: 30px; }
+        .cert-thumb { width: 100px; height: 70px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.05); overflow: hidden; }
+        .cert-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
+        .facilities-wrap { display: grid; grid-template-columns: 1fr 1.2fr; gap: 60px; align-items: center; }
+        .fac-info { text-align: left; }
+        .fac-kicker { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #00E5FF; margin-bottom: 20px; display: block; }
+        .fac-title { font-size: 32px; font-weight: 700; margin-bottom: 20px; color: #ffffff; }
+        .fac-desc { font-size: 14px; color: rgba(255, 255, 255, 0.5); line-height: 1.8; margin-bottom: 35px; }
+        .fac-details { list-style: none; padding: 0; }
+        .fac-details li { display: flex; gap: 15px; margin-bottom: 18px; font-size: 14px; color: rgba(255, 255, 255, 0.7); }
+        .fac-details i { color: #00E5FF; margin-top: 4px; }
+        .fac-gallery { display: flex; gap: 15px; justify-content: center; width: 100%; }
+        .gallery-item { border-radius: 1.8rem; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); width: 30%; height: 200px; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        .gi-large { width: 40%; }
+        .process-wrap { display: grid; grid-template-columns: 1fr 1.5fr; gap: 80px; text-align: left; }
+        .step-item { display: flex; gap: 30px; padding: 35px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+        .step-num { font-family: 'Cormorant Garamond', serif; font-size: 54px; color: rgba(0, 229, 255, 0.2); min-width: 70px; }
+        .step-name { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 10px; }
+        .step-info { font-size: 14px; color: rgba(255, 255, 255, 0.5); line-height: 1.7; }
+        .awards-glass-wrap { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 60px; align-items: center; text-align: left; }
+        .award-kicker { font-size: 24px; font-weight: 700; color: #00E5FF; margin-bottom: 20px; }
+        .award-desc { font-size: 15px; color: rgba(255, 255, 255, 0.6); line-height: 1.8; }
+        .award-image-box { background: rgba(255, 255, 255, 0.03); border-radius: 2rem; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .award-image-box img { width: 100%; border-radius: 1rem; }
+        .cta-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; background: rgba(79, 195, 247, 0.1); border: 1px solid rgba(79, 195, 247, 0.2); border-radius: 999px; color: #00E5FF; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; }
+        .cta-info-grid { display: grid; grid-template-columns: repeat(2, auto); justify-content: center; gap: 20px 40px; margin-top: 45px; }
+        .cta-info-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: rgba(255, 255, 255, 0.5); }
+        .cta-info-item i { color: #00E5FF; }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{header :: header}"></div>
+
+    <div class="hero">
+        <div class="hero-card-wide">
+            <div class="hero-content">
+                <span class="hero-badge">Dịch vụ chăm sóc tốt nhất nghệ an 2026</span>
+                <h1>Chăm sóc<br><em>nụ cười</em> của bạn</h1>
+                <p>Hệ thống đặt lịch nha khoa hiện đại, nhanh chóng và chuyên nghiệp. Chúng tôi mang đến trải nghiệm điều trị không đau với tiêu chuẩn quốc tế.</p>
+                
+                <div class="hero-actions">
+                    <a th:href="@{/booking}" class="btn-booking">ĐẶT LỊCH NGAY</a>
+                    <a th:href="@{/service-list}" class="btn-booking btn-ghost">XEM DỊCH VỤ</a>
+                </div>
+            </div>
+
+            <div class="hero-image-box">
+                <div class="image-inner">
+                    <img th:src="@{/assets/Images/xuantruong.jpg}" alt="Dental Care" />
+                </div>
+                <div class="image-glow"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-stats">
+        <div class="stat-glass-box">
+            <span class="stat-num">15<span>K+</span></span>
+            <span class="stat-label">BỆNH NHÂN</span>
+        </div>
+        <div class="stat-glass-box">
+            <span class="stat-num">98<span>%</span></span>
+            <span class="stat-label">HÀI LÒNG</span>
+        </div>
+        <div class="stat-glass-box">
+            <span class="stat-num">12<span>+</span></span>
+            <span class="stat-label">NĂM KINH NGHIỆM</span>
+        </div>
+    </div>
+
+    <section class="services-section" id="services">
+        <div class="services-glass-wrap">
+            <div class="services-header">
+                <span class="services-kicker">Dịch vụ của chúng tôi</span>
+                <h2 class="services-title">Chăm Sóc <em>Toàn Diện</em><br>Cho Nụ Cười</h2>
+                <p class="services-sub">Từ khám định kỳ đến phẫu thuật phức tạp, chúng tôi cam kết mang lại trải nghiệm tốt nhất.</p>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="dr-img-wrap" style="height: 200px; margin-bottom: 20px;">
+                        <img th:src="@{/assets/Images/imlan.jpg}" alt="Cấy Ghép Implant" style="filter: brightness(0.85);" />
+                    </div>
+                    <h3>Cấy Ghép Implant</h3>
+                    <p>Phục hồi răng mất hoàn toàn với công nghệ implant tiên tiến nhất, bảo vệ xương hàm.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="dr-img-wrap" style="height: 200px; margin-bottom: 20px;">
+                        <img th:src="@{/assets/Images/tayrang.jpg}" alt="Tẩy Trắng Răng" style="filter: brightness(0.85);" />
+                    </div>
+                    <h3>Tẩy Trắng Răng</h3>
+                    <p>Phương pháp Zoom Whitening cho kết quả sáng trắng vượt trội chỉ sau 45 phút điều trị.</p>
+                </div>
+
+                <div class="service-card">
+                    <div class="dr-img-wrap" style="height: 200px; margin-bottom: 20px;">
+                        <img th:src="@{/assets/Images/nieng.jpg}" alt="Niềng Răng" style="filter: brightness(0.85);" />
+                    </div>
+                    <h3>Niềng Răng</h3>
+                    <p>Invisalign và mắc cài sứ thẩm mỹ giúp bạn tự tin hơn trong suốt quá trình chỉnh nha.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="dental-chatbot-launcher" id="chatLauncher" onclick="toggleChatWindow()">
+        <i class="fa-solid fa-robot chatbot-icon"></i>
+        <span class="chat-notif-badge" id="notifBadge">0</span>
+    </div>
+
+    <div class="chat-window-small glass-card" id="chatWindow">
+        <div class="chat-header">
+            <div class="dr-info">
+                <span>Hỗ trợ trực tuyến</span>
+            </div>
+            <button class="close-chat" onclick="toggleChatWindow()">&times;</button>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="chat-bubble bot">Chào Bạn! Nha Khoa NAU có thể giúp gì cho bạn?</div>
+            <th:block th:each="m : ${listMessages}">
+                <div class="chat-bubble user" th:text="${m.message}"></div>
+                <div class="chat-bubble bot" th:if="${m.replyMessage != null}" th:text="${m.replyMessage}"></div>
+            </th:block>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="userMsgInput" placeholder="Nhập tin nhắn..." required spellcheck="false">
+            <button type="button" onclick="customerSendMessage()">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <section class="dr-detail-section">
+        <div class="dr-detail-wrap">
+            <div class="dr-detail-left">
+                <div class="dr-circle-bg"></div>
+                <img th:src="@{/assets/Images/kim.jpg}" class="dr-detail-img" alt="BS Nguyễn Thị Kim Dung" />
+            </div>
+            <div class="dr-detail-right">
+                <h3 class="dr-detail-name">Nguyễn Thị Kim Dung</h3>
+                <div class="dr-detail-badge"><i class="fa-solid fa-user-doctor"></i> Bác Sĩ</div>
+                <p class="dr-detail-desc">Bác sĩ Nguyễn Thị Kim Dung đã có 11 năm kinh nghiệm làm việc trong lĩnh vực nha khoa, có thể thực hiện thành thạo các kỹ thuật nha khoa khác nhau để điều trị những bệnh lý về răng miệng.</p>
+                <div class="dr-cert-title"><i class="fa-solid fa-award"></i> Chứng chỉ chuyên môn</div>
+                <ul class="dr-cert-list">
+                    <li>Tốt nghiệp bác sĩ Răng hàm mặt – Trường ĐH Nghệ An</li>
+                    <li>Chứng chỉ hành nghề khám chữa bệnh của Sở Y tế Vinh</li>
+                    <li>Chứng nhận hoàn thành khóa học 'Phục hình thẩm mỹ răng' do HANODENT cấp</li>
+                </ul>
+                <div class="dr-certs-thumbs">
+                    <div class="cert-thumb"><img th:src="@{/assets/Images/cn.jpg}" alt="Cert" /></div>
+                    <div class="cert-thumb"><img th:src="@{/assets/Images/cn.jpg}" alt="Cert" /></div>
+                    <div class="cert-thumb"><img th:src="@{/assets/Images/cn.jpg}" alt="Cert" /></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="doctors-section" id="doctors">
+        <h2 class="doctors-title">Đội Ngũ <em>Chuyên Gia</em></h2>
+        <div class="doctors-grid">
+            <div class="dr-card">
+                <div class="dr-img-wrap"><img th:src="@{/assets/Images/bt.jpg}" alt="Bác sĩ Tồng" /></div>
+                <div class="dr-info"><h4 class="dr-name">Xồng Bá Tồng</h4><p class="dr-title">Bác Sĩ Chuyên Khoa II</p></div>
+            </div>
+            <div class="dr-card">
+                <div class="dr-img-wrap"><img th:src="@{/assets/Images/luc.jpg}" alt="Bác sĩ Lực" /></div>
+                <div class="dr-info"><h4 class="dr-name">Lê Đình Lực</h4><p class="dr-title">Bác Sĩ Thẩm Mỹ Răng Hàm Mặt</p></div>
+            </div>
+            <div class="dr-card">
+                <div class="dr-img-wrap"><img th:src="@{/assets/Images/hst.jpg}" alt="Bác sĩ Vân Tuấn" /></div>
+                <div class="dr-info"><h4 class="dr-name">Hồ Sỹ Tuấn</h4><p class="dr-title">Bác Sĩ CKI - Chỉnh Nha Invisalign</p></div>
+            </div>
+            <div class="dr-card">
+                <div class="dr-img-wrap"><img th:src="@{/assets/Images/ducbien.jpg}" alt="Bác sĩ Biên" /></div>
+                <div class="dr-info"><h4 class="dr-name">Đậu Đức Biên</h4><p class="dr-title">Bác Sĩ Cắm Ghép Implant</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="facilities-section">
+        <div class="facilities-wrap">
+            <div class="fac-info">
+                <span class="fac-kicker">Hệ thống nha khoa uy tín</span>
+                <h2 class="fac-title">Cơ sở 1 Lý Tự Trọng, Phường Vinh Phú, TP Vinh</h2>
+                <p class="fac-desc">Nha khoa NAU với kinh nghiệm hơn 16 năm hình thành và phát triển, đã mở rộng quy mô hệ thống với cơ sở hiện đại tại trung tâm thành phố Vinh, mang lại không gian điều trị sang trọng và thư giãn.</p>
+                <ul class="fac-details">
+                    <li><i class="fa-solid fa-location-dot"></i><span><b>Địa chỉ:</b> 51 Lý Tự Trọng, phường Vinh Phú, TP Vinh</span></li>
+                    <li><i class="fa-solid fa-clock"></i><span><b>Thời gian làm việc:</b> Từ thứ 2 đến Chủ Nhật | 08h00 – 19h00 (trừ ngày lễ Tết)</span></li>
+                    <li><i class="fa-solid fa-phone-flip"></i><span><b>Số điện thoại:</b> 0376.439.199 hoặc 0345.749.199</span></li>
+                </ul>
+            </div>
+            <div class="fac-gallery">
+                <div class="gallery-item"><img th:src="@{/assets/Images/phongcho.jpg}" alt="Phòng chờ" /></div>
+                <div class="gallery-item"><img th:src="@{/assets/Images/quayletan.jpg}" alt="Phòng khám" /></div>
+                <div class="gallery-item gi-large"><img th:src="@{/assets/Images/phongkham.jpg}" alt="Quầy lễ tân" /></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="process-section">
+        <div class="process-wrap">
+            <div class="process-left">
+                <span class="services-kicker">Quy trình</span>
+                <h2 class="services-title" style="text-align: left;">Từng Bước<br><em>Chuyên Nghiệp</em></h2>
+                <p style="text-align: left; margin-left: 0;">Chúng tôi đặt sự an toàn và thoải mái của bạn lên hàng đầu trong mọi quy trình điều trị.</p>
+            </div>
+            <div class="process-steps">
+                <div class="step-item"><div class="step-num">01</div><div class="step-body"><div class="step-name">Đặt Lịch và Tư Vấn</div><div class="step-info">Đặt lịch trực tuyến 24/7, nhận tư vấn miễn phí từ bác sĩ chuyên khoa qua chat hoặc gặp trực tiếp.</div></div></div>
+                <div class="step-item"><div class="step-num">02</div><div class="step-body"><div class="step-name">Thăm Khám và Chụp X-Quang</div><div class="step-info">Thăm khám lâm sàng kết hợp chụp X-Quang 3D Cone Beam để chẩn đoán chính xác nhất.</div></div></div>
+                <div class="step-item"><div class="step-num">03</div><div class="step-body"><div class="step-name">Lên Phác Đồ Điều Trị</div><div class="step-info">Bác sĩ tư vấn phác đồ điều trị chi tiết, rõ ràng về thời gian, chi phí và kết quả kỳ vọng.</div></div></div>
+                <div class="step-item"><div class="step-num">04</div><div class="step-body"><div class="step-name">Điều Trị và Theo Dõi</div><div class="step-info">Thực hiện điều trị trong môi trường vô khuẩn tuyệt đối, theo dõi hậu điều trị tận tình và chuyên nghiệp.</div></div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="awards-section">
+        <div class="awards-glass-wrap">
+            <div class="award-content">
+                <h3 class="award-kicker">Nha khoa NAU đạt Hạng Vàng<br>Thương hiệu Nha khoa số 1 Việt Nam 2025</h3>
+                <p class="award-desc">Vượt qua nhiều phòng khám và địa chỉ nha khoa, hệ thống Nha khoa Quốc tế NAU đã xuất sắc đạt Hạng Vàng Thương hiệu Nha khoa số 1 nhờ những đóng góp tích cực trong việc ứng dụng công nghệ cao vào điều trị.</p>
+            </div>
+            <div class="award-image-box">
+                <img th:src="@{/assets/Images/cn.jpg}" alt="Giải thưởng nha khoa 2025" />
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="cta-wrap">
+            <div class="cta-badge"><i class="fa-solid fa-star"></i> Ưu đãi đặc biệt tháng này</div>
+            <h2 class="cta-title">Sẵn Sàng Cho Một<br><em>Nụ Cười Mới?</em></h2>
+            <p class="services-sub" style="margin-bottom: 45px;">Đặt lịch ngay hôm nay, nhận tư vấn miễn phí và giảm 15% cho lần điều trị đầu tiên.</p>
+            <a th:href="@{/booking}" class="btn-booking" style="padding: 22px 60px; font-size: 15px;"><i class="fa-regular fa-calendar-check"></i> ĐẶT LỊCH NGAY — MIỄN PHÍ</a>
+            <div class="cta-info-grid">
+                <div class="cta-info-item"><i class="fa-solid fa-check"></i> Không mất phí đặt lịch</div>
+                <div class="cta-info-item"><i class="fa-solid fa-check"></i> Hủy lịch linh hoạt</div>
+                <div class="cta-info-item"><i class="fa-solid fa-check"></i> Xác nhận qua SMS</div>
+                <div class="cta-info-item"><i class="fa-solid fa-check"></i> Đội ngũ 24/7</div>
+            </div>
+        </div>
+    </section>
+
+    <div th:replace="~{footer :: footer}"></div>
+
+    <script th:inline="javascript">
+        var CONTEXT_PATH = /*[[@{/}]]*/ '/';
+        if (CONTEXT_PATH === '/') CONTEXT_PATH = '';
+
+        var lastMessageCount = 0;
+        var isFirstLoad = true; 
+
+        function renderChatUI(data) {
+            var chatBody = document.getElementById('chatBody');
+            var botImg = "https://cdn-icons-png.flaticon.com/512/3774/3774299.png"; 
+            var userImg = "https://cdn-icons-png.flaticon.com/512/3048/3048127.png"; 
+            var html = '<div class="message-wrapper bot"><img src="' + botImg + '" class="chat-avatar"><div class="chat-bubble bot">Chào bạn! NHA KHOA NAU có thể giúp gì bạn?</div></div>';
+            
+            if (data && data.length > 0) {
+                data.forEach(function(msg) {
+                    var isUser = (msg.role === 'Patient');
+                    var avatarSrc = isUser ? userImg : botImg;
+                    var sideClass = isUser ? 'user' : 'bot';
+                    html += '<div class="message-wrapper ' + sideClass + '"><img src="' + avatarSrc + '" class="chat-avatar"><div class="chat-bubble ' + sideClass + '"><span>' + msg.content + '</span></div></div>';
+                });
+            }
+            chatBody.innerHTML = html;
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function checkForDoctorReply() {
+            fetch(CONTEXT_PATH + '/get-latest-reply') 
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    var win = document.getElementById('chatWindow');
+                    var badge = document.getElementById('notifBadge');
+                    if (data && data.length > 0) {
+                        if (win.style.display === 'flex') {
+                            renderChatUI(data);
+                            lastMessageCount = data.length;
+                            badge.style.display = 'none';
+                        } else {
+                            if (data.length > lastMessageCount && !isFirstLoad) {
+                                badge.innerText = data.length - lastMessageCount;
+                                badge.style.display = 'flex';
+                            }
+                        }
+                    }
+                }).catch(function() {});
+        }
+
+        function toggleChatWindow() {
+            var win = document.getElementById('chatWindow');
+            var launcher = document.getElementById('chatLauncher');
+            var badge = document.getElementById('notifBadge');
+            var isHidden = (win.style.display === 'none' || win.style.display === '');
+            
+            if (isHidden) {
+                win.style.display = 'flex';
+                badge.style.display = 'none'; 
+                launcher.style.transform = 'rotate(90deg) scale(0.8)';
+                fetch(CONTEXT_PATH + '/get-latest-reply')
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) { lastMessageCount = data.length; renderChatUI(data); });
+            } else {
+                win.style.display = 'none';
+                launcher.style.transform = '';
+            }
+        }
+
+        function customerSendMessage() {
+            var input = document.getElementById('userMsgInput');
+            var message = input.value.trim();
+            if (!message) return;
+
+            fetch(CONTEXT_PATH + '/send-contact-ajax', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'message=' + encodeURIComponent(message)
+            })
+            .then(function(res) { return res.text(); })
+            .then(function(status) {
+                if (status.trim() === "success") {
+                    input.value = '';
+                    checkForDoctorReply(); 
+                }
+            });
+        }
+
+        window.onload = function() {
+            fetch(CONTEXT_PATH + '/get-latest-reply')
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data) { lastMessageCount = data.length; renderChatUI(data); }
+                    isFirstLoad = false;
+                }).catch(function() { isFirstLoad = false; });
+
+            document.getElementById('userMsgInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') customerSendMessage();
+            });
+        };
+        setInterval(checkForDoctorReply, 4000);
+		
+		function toggleSearchMenu(event) {
+		            event.stopPropagation();
+		            const searchMenu = document.getElementById('searchDropdown');
+		            const userMenu = document.getElementById('userDropdown');
+		            if (userMenu) userMenu.style.display = 'none';
+		            if (searchMenu) {
+		                searchMenu.style.display = (searchMenu.style.display === 'block') ? 'none' : 'block';
+		            }
+		        }
+
+		        function toggleUserMenu(event) {
+		            event.stopPropagation();
+		            const userMenu = document.getElementById('userDropdown');
+		            const searchMenu = document.getElementById('searchDropdown');
+		            if (searchMenu) searchMenu.style.display = 'none';
+		            if (userMenu) {
+		                userMenu.style.display = (userMenu.style.display === 'block') ? 'none' : 'block';
+		            }
+		        }
+
+		        // Click ra ngoài tự động đóng menu ẩn
+		        window.addEventListener('click', function() {
+		            const searchMenu = document.getElementById('searchDropdown');
+		            const userMenu = document.getElementById('userDropdown');
+		            if (searchMenu) searchMenu.style.display = 'none';
+		            if (userMenu) userMenu.style.display = 'none';
+		        });
+    </script>
+</body>
+</html>

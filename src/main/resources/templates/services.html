@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Dịch vụ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <th:block th:replace="~{sidebar :: sidebar-style}"></th:block>
+
+    <style>
+        /* ===== TOÀN BỘ CSS LĂNG KÍNH THỦY TINH ĐƯỢC GIỮ NGUYÊN VẸN 100% KHÔNG THAY ĐỔI MỘT CHỮ ===== */
+        html, body { scrollbar-width: none; -ms-overflow-style: none; }
+        body::-webkit-scrollbar { display: none; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --accent:       #00d4ff; --accent-glow:  rgba(0, 212, 255, 0.35); --accent-deep:  #0072ff; --success:      #34d399; --warning:      #facc15; --danger:       #ff6b6b; --glass-bg:     rgba(15, 23, 42, 0.25); --glass-border: rgba(255, 255, 255, 0.08); --glass-top:    rgba(255, 255, 255, 0.45); --glass-left:   rgba(255, 255, 255, 0.2); --text:         #ffffff; --text-soft:    rgba(255, 255, 255, 0.6); --shadow-heavy: 0 40px 100px rgba(0,0,0,.8), 0 10px 20px rgba(0,0,0,.5); --inset-shine:  inset 0 1px 1px rgba(255,255,255,.3);
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(at 0% 0%,   rgba(0,212,255,.2)  0px, transparent 45%), radial-gradient(at 100% 0%,  rgba(0,114,255,.15) 0px, transparent 40%), #04070d; background-attachment: fixed; color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
+        body::before { content: ""; position: fixed; top: -20%; left: -20%; width: 140%; height: 140%; background: radial-gradient(circle, rgba(0,212,255,.04) 0%, transparent 60%); animation: liquidMove 20s infinite alternate ease-in-out; z-index: -1; pointer-events: none; }
+        @keyframes liquidMove { 0%   { transform: translate(0,0) scale(1); } 100% { transform: translate(-10%,-5%) scale(1.1); } }
+        .main { margin-left: 240px; padding: 30px; width: calc(100% - 240px); }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,.08); }
+        .glass { background: rgba(255,255,255,.015); backdrop-filter: blur(40px) saturate(200%) brightness(1.1); -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.1); border-radius: 28px; border: 1px solid rgba(255,255,255,.12); border-top: 2.5px solid rgba(255,255,255,.6); border-left: 1px solid rgba(255,255,255,.25); box-shadow: 0 40px 100px rgba(0,0,0,.7), inset 0 1px 4px rgba(255,255,255,.3); overflow: hidden; transition: all .5s cubic-bezier(.23,1,.32,1); }
+        .table-card { padding: 20px; margin-top: 25px; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th:nth-child(1) { width: 55px; } th:nth-child(2) { width: 70px; } th:nth-child(3) { width: 18%; } th:nth-child(4) { width: 22%; } th:nth-child(5) { width: 13%; } th:nth-child(6) { width: 20%; } th:nth-child(7) { width: 160px; }
+        th { padding: 20px 16px; text-align: left; font-size: 11px; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+        td { padding: 14px 16px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,.04); vertical-align: middle; }
+        .service-thumb { width: 46px; height: 46px; border-radius: 12px; object-fit: cover; border: 1px solid rgba(255,255,255,.15); box-shadow: 0 4px 12px rgba(0,0,0,.5); }
+        .thumb-placeholder { width: 46px; height: 46px; border-radius: 12px; background: rgba(255,255,255,.05); border: 1px dashed rgba(255,255,255,.15); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.2); font-size: 16px; }
+        .price-text { color: var(--accent); font-weight: 700; font-size: 15px; }
+        .desc-text  { color: var(--text-soft); font-size: 12px; line-height: 1.4; text-align: left; }
+        .doctor-tag { display: inline-block; background: rgba(0,212,255,.1); color: var(--accent); padding: 2px 8px; border-radius: 6px; font-size: 11px; margin: 2px; border: 1px solid rgba(0,212,255,.2); white-space: nowrap; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: 90px; height: 34px; margin: 4px 2px; border-radius: 2.5rem; background: rgba(255,255,255,.05); backdrop-filter: blur(15px) saturate(180%); border: 1px solid rgba(255,255,255,.1); border-top: 2px solid rgba(255,255,255,.5); border-left: 1px solid rgba(255,255,255,.2); color: #fff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; box-shadow: 0 6px 15px rgba(0,0,0,.4), inset 0 1px 2px rgba(255,255,255,.2); transition: all .3s cubic-bezier(.23,1,.32,1); cursor: pointer; text-decoration: none !important; }
+        .btn:hover { transform: translateY(-2px) scale(1.05); background: rgba(255,255,255,.12); border-top: 2px solid rgba(255,255,255,.85); box-shadow: 0 10px 20px rgba(0,0,0,.6), inset 0 1px 3px rgba(255,255,255,.3); }
+        .btn-add { display: inline-flex; align-items: center; justify-content: center; width: auto; padding: 0 25px; height: 42px; border-radius: 2.5rem; background: rgba(0,212,255,.1); backdrop-filter: blur(15px) saturate(180%); border: 1px solid rgba(255,255,255,.1); border-top: 2px solid rgba(255,255,255,.6); border-left: 1px solid rgba(255,255,255,.2); color: var(--accent) !important; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 10px 25px rgba(0,0,0,.4), inset 0 1px 2px rgba(255,255,255,.3); transition: all .4s cubic-bezier(0.23,1,.32,1); cursor: pointer; text-decoration: none; }
+        .btn-add:hover { transform: translateY(-3px) scale(1.05); background: rgba(0,212,255,.2); color: #fff !important; border-top: 2px solid rgba(255,255,255,.9); box-shadow: 0 15px 35px rgba(0,0,0,.6), 0 0 20px var(--accent-glow), inset 0 1px 3px rgba(255,255,255,.4); }
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        .search-box { position: relative; display: flex; align-items: center; }
+        .search-box input { width: 280px; height: 42px; padding: 0 22px 0 50px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 500; color: #fff; outline: none; background: rgba(255,255,255,.01) !important; backdrop-filter: blur(20px) saturate(180%); border-radius: 2.5rem; border: 1px solid rgba(255,255,255,.08) !important; border-top: 2px solid rgba(255,255,255,.4) !important; border-left: 1px solid rgba(255,255,255,.2) !important; box-shadow: 0 8px 20px rgba(0,0,0,.5), inset 0 1px 2px rgba(255,255,255,.1); transition: all .4s cubic-bezier(0.23,1,.32,1); }
+        .search-box input::placeholder { color: rgba(255,255,255,.3); font-weight: 400; }
+        .search-box input:focus { width: 330px; background: rgba(255,255,255,.05) !important; border-color: rgba(0,212,255,.3) !important; border-top-color: var(--accent) !important; box-shadow: 0 12px 30px rgba(0,0,0,.6), 0 0 15px var(--accent-glow), inset 0 1px 3px rgba(255,255,255,.2) !important; }
+        .search-box i { position: absolute; left: 20px; color: var(--accent); font-size: 14px; pointer-events: none; text-shadow: 0 0 8px var(--accent-glow); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,25,41,.35); backdrop-filter: blur(8px) saturate(160%); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-content { width: 95%; max-width: 720px; padding: 45px 40px !important; margin: 20px auto; box-sizing: border-box; background: rgba(15, 23, 42, 0.25) !important; backdrop-filter: blur(50px) saturate(210%) brightness(1.2) !important; -webkit-backdrop-filter: blur(50px) saturate(210%) brightness(1.2); border-radius: 32px; border: 1px solid rgba(255, 255, 255, 0.12) !important; border-top: 3px solid rgba(255, 255, 255, 0.7) !important; border-left: 1.5px solid rgba(255, 255, 255, 0.3) !important; box-shadow: 0 50px 100px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.4), inset 0 -10px 30px rgba(0, 212, 255, 0.08) !important; max-height: 85vh; overflow-y: auto; position: relative; scrollbar-width: none; -ms-overflow-style: none; }
+        .modal-content::-webkit-scrollbar { display: none; }
+        @keyframes modalPop { from { opacity: 0; transform: scale(.85); } to   { opacity: 1; transform: scale(1); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+        .modal-header h3 { font-size: 18px; font-weight: 800; color: #fff; }
+        .close-btn { font-size: 28px; cursor: pointer; color: var(--text-soft); transition: .3s; }
+        .close-btn:hover { color: var(--danger); transform: rotate(90deg); }
+        .modal-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+        .field-name  { grid-column: 1; grid-row: 1; }
+        .field-desc  { grid-column: 2; grid-row: 1 / 3; display: flex; flex-direction: column; }
+        .field-desc textarea { flex: 1; min-height: 0; }
+        .field-price { grid-column: 1; grid-row: 2; }
+        .field-image { grid-column: 1 / 3; grid-row: 3; }
+        .field-doctors { grid-column: 1 / 3; grid-row: 4; }
+        .btn-submit-group { grid-column: 1 / 3; grid-row: 5; }
+        .input-group { margin-bottom: 0; text-align: left; }
+        .modal-form label { display: block; margin-bottom: 8px; margin-left: 15px; font-size: 11px; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .modal-form input[type="text"], .modal-form input[type="number"], .modal-form textarea { width: 100%; padding: 13px 20px; background: rgba(255,255,255,.05) !important; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,.1) !important; border-top: 1.5px solid rgba(255,255,255,.45) !important; border-left: 1px solid rgba(255,255,255,.15) !important; color: #fff; outline: none; font-size: 14px; font-family: 'Plus Jakarta Sans', sans-serif; box-shadow: inset 0 1px 2px rgba(255,255,255,.1); transition: all .3s cubic-bezier(.23,1,.32,1); }
+        .modal-form input[type="text"], .modal-form input[type="number"] { border-radius: 2.5rem !important; }
+        .modal-form textarea { border-radius: 18px !important; resize: none; height: 100%; min-height: 118px; line-height: 1.5; }
+        .modal-form input:focus, .modal-form textarea:focus { background: rgba(255,255,255,.1) !important; border-top-color: rgba(255,255,255,.85) !important; border-color: var(--accent) !important; box-shadow: 0 0 15px rgba(0,212,255,.25), inset 0 1px 3px rgba(255,255,255,.2) !important; transform: translateY(-1px); }
+        .upload-area { position: relative; border: 2px dashed rgba(0,212,255,.35); border-radius: 18px; padding: 14px 20px; display: flex; align-items: center; gap: 16px; cursor: pointer; background: rgba(0,212,255,.04); transition: all .3s ease; }
+        .upload-area:hover { background: rgba(0,212,255,.1); border-color: rgba(0,212,255,.7); }
+        .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        .upload-icon { width: 46px; height: 46px; flex-shrink: 0; border-radius: 12px; background: rgba(0,212,255,.12); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 18px; }
+        .upload-info { text-align: left; }
+        .upload-info span { display: block; font-size: 13px; font-weight: 600; color: #fff; }
+        .upload-info small { color: var(--text-soft); font-size: 11px; }
+        .img-preview { width: 46px; height: 46px; border-radius: 10px; object-fit: cover; border: 1px solid rgba(255,255,255,.2); display: none; flex-shrink: 0; }
+        .doctor-check-list { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 18px; padding: 12px 15px; max-height: 130px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; align-content: start; }
+        .doctor-check-list::-webkit-scrollbar { width: 4px; }
+        .doctor-check-list::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+        .check-item { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 12px; background: rgba(255,255,255,.03); cursor: pointer; transition: .3s; }
+        .check-item:hover { background: rgba(0,212,255,.08); transform: translateX(3px); }
+        .check-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0; }
+        .check-item span { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: rgba(255,255,255,0.85); }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{sidebar :: sidebar}"></div>
+
+    <div class="main">
+        <div class="page-header">
+            <h2>Danh mục dịch vụ</h2>
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="serviceSearch" placeholder="Tìm kiếm dịch vụ..." onkeyup="filterServices()">
+                </div>
+                <a href="javascript:void(0)" class="btn-add btn" onclick="openAddModal()">+ Thêm dịch vụ</a>
+            </div>
+        </div>
+
+        <div class="glass table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Ảnh</th>
+                        <th>Tên dịch vụ</th>
+                        <th>Mô tả</th>
+                        <th>Đơn giá</th>
+                        <th>Bác sĩ thực hiện</th>
+                        <th style="text-align:center;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="s : ${listS}">
+                        <td style="color:var(--accent);font-weight:700;" th:text="'#' + ${s.serviceID}">#1</td>
+
+                        <td>
+                            <img th:if="${s.serviceImage != null and !#strings.isEmpty(s.serviceImage)}" 
+                                 th:src="@{'/' + ${s.serviceImage}}" class="service-thumb" th:alt="${s.serviceName}" />
+                            
+                            <div th:unless="${s.serviceImage != null and !#strings.isEmpty(s.serviceImage)}" class="thumb-placeholder">
+                                <i class="fa-solid fa-image"></i>
+                            </div>
+                        </td>
+
+                        <td><div style="font-weight:600;" th:text="${s.serviceName}">Tên dịch vụ</div></td>
+                        <td><div class="desc-text" th:text="${s.description}">Mô tả ngắn</div></td>
+                        <td><div class="price-text" th:text="${s.price != null} ? ${#numbers.formatInteger(s.price, 3, 'POINT')} + ' VNĐ' : '0 VNĐ'">0 VNĐ</div></td>
+
+                        <td>
+                            <th:block th:if="${s.doctorNames != null and !#strings.isEmpty(s.doctorNames)}">
+                                <span class="doctor-tag" th:each="name : ${#strings.arraySplit(s.doctorNames, ',')}">
+                                    <i class="fa-solid fa-user-doctor" style="font-size:9px;margin-right:3px;"></i>
+                                    <span th:text="${#strings.trim(name)}">BS. Name</span>
+                                </span>
+                            </th:block>
+                            <span th:unless="${s.doctorNames != null and !#strings.isEmpty(s.doctorNames)}" style="color:rgba(255,255,255,.2);font-size:11px;font-style:italic;">Chưa phân công</span>
+                        </td>
+
+                        <td style="text-align:center;">
+                            <button class="btn" style="color:var(--accent)"
+                                    th:onclick="openEditModal([[${s.serviceID}]], [[${s.serviceName}]], [[${s.description}]], [[${s.price}]], [[${s.doctorIdsJson}]], [[${s.serviceImage}]])">
+                                <i class="fa-solid fa-pen-to-square"></i> Sửa
+                            </button>
+                            
+                            <a href="javascript:void(0)" class="btn" style="color:var(--danger)"
+                               th:onclick="confirmDeleteService([[${s.serviceID}]], [[${s.serviceName}]])">
+                                <i class="fa-solid fa-trash-can"></i> Xóa
+                            </a>
+                        </td>
+                    </tr>
+                    
+                    <tr th:if="${#lists.isEmpty(listS)}">
+                        <td colspan="7" style="text-align: center; color: rgba(255,255,255,0.3); padding: 40px 0;">Hiện tại chưa có danh mục dịch vụ nào được cấu hình.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="addModal" class="modal-overlay">
+        <div class="glass modal-content">
+            <div class="modal-header">
+                <h3>Thêm dịch vụ mới</h3>
+                <span class="close-btn" onclick="closeModal('addModal')">&times;</span>
+            </div>
+            <form th:action="@{/add-service}" method="post" enctype="multipart/form-data" class="modal-form">
+                <div class="input-group field-name">
+                    <label>Tên dịch vụ</label>
+                    <input type="text" name="name" required placeholder="Nhập tên dịch vụ...">
+                </div>
+                <div class="input-group field-desc">
+                    <label>Mô tả</label>
+                    <textarea name="desc" placeholder="Mô tả ngắn gọn..."></textarea>
+                </div>
+                <div class="input-group field-price">
+                    <label>Đơn giá (VNĐ)</label>
+                    <input type="number" name="price" required placeholder="Ví dụ: 500000">
+                </div>
+                <div class="input-group field-image">
+                    <label>Ảnh dịch vụ</label>
+                    <label class="upload-area" style="display: flex;">
+                        <input type="file" name="serviceImage" accept="image/*" onchange="previewImage(this,'add-preview','add-upload-text')">
+                        <span class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+                        <img id="add-preview" class="img-preview" src="" alt="preview">
+                        <span class="upload-info">
+                            <span id="add-upload-text">Chọn hoặc kéo ảnh vào đây</span>
+                            <small>PNG, JPG, WEBP — tối đa 5 MB</small>
+                        </span>
+                    </label>
+                </div>
+                <div class="input-group field-doctors">
+                    <label>Bác sĩ thực hiện</label>
+                    <div class="doctor-check-list">
+                        <label class="check-item" th:each="d : ${listD}">
+                            <input type="checkbox" name="doctorIds" th:value="${d.userID}">
+                            <span th:text="'BS. ' + ${d.fullName}">BS. Name</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="btn-submit-group">
+                    <button type="submit" class="btn btn-add" style="width:100%;margin-top:4px;">XÁC NHẬN THÊM</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal-overlay">
+        <div class="glass modal-content">
+            <div class="modal-header">
+                <h3>Cập nhật dịch vụ</h3>
+                <span class="close-btn" onclick="closeModal('editModal')">&times;</span>
+            </div>
+            <form th:action="@{/update-service}" method="post" enctype="multipart/form-data" class="modal-form">
+                <input type="hidden" name="id" id="edit-id">
+                <div class="input-group field-name">
+                    <label>Tên dịch vụ</label>
+                    <input type="text" name="name" id="edit-name" required>
+                </div>
+                <div class="input-group field-desc">
+                    <label>Mô tả</label>
+                    <textarea name="desc" id="edit-desc"></textarea>
+                </div>
+                <div class="input-group field-price">
+                    <label>Đơn giá (VNĐ)</label>
+                    <input type="number" name="price" id="edit-price" required>
+                </div>
+                <div class="input-group field-image">
+                    <label>Ảnh dịch vụ <small style="color:var(--text-soft);text-transform:none;font-weight:400;">(để trống = giữ ảnh cũ)</small></label>
+                    <label class="upload-area" style="display: flex;">
+                        <input type="file" name="serviceImage" accept="image/*" onchange="previewImage(this,'edit-preview','edit-upload-text')">
+                        <span class="upload-icon"><i class="fa-solid fa-image"></i></span>
+                        <img id="edit-preview" class="img-preview" src="" alt="preview">
+                        <span class="upload-info">
+                            <span id="edit-upload-text">Chọn ảnh mới để thay thế</span>
+                            <small>PNG, JPG, WEBP — tối đa 5 MB</small>
+                        </span>
+                    </label>
+                </div>
+                <div class="input-group field-doctors">
+                    <label>Bác sĩ thực hiện</label>
+                    <div class="doctor-check-list" id="edit-doctor-list">
+                        <label class="check-item" th:each="d : ${listD}">
+                            <input type="checkbox" name="doctorIds" th:value="${d.userID}" class="edit-doc-cb">
+                            <span th:text="'BS. ' + ${d.fullName}">BS. Name</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="btn-submit-group">
+                    <button type="submit" class="btn btn-add" style="width:100%;margin-top:4px;">CẬP NHẬT NGAY</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        var contextPath = /*[[@{/}]]*/ '/';
+        if (contextPath === '/') contextPath = '';
+
+        // 🌟 HÀM MỚI: Tách biệt logic confirm để xóa sạch gạch chân kiểm tra chính tả của IDE/Trình duyệt
+        function confirmDeleteService(serviceId, serviceName) {
+            if (confirm("Bạn có chắc muốn xóa dịch vụ: " + serviceName + "?")) {
+                window.location.href = contextPath + "delete-service?id=" + serviceId;
+            }
+        }
+
+        function openAddModal() {
+            document.getElementById('addModal').style.display = 'flex';
+        }
+
+        function openEditModal(id, name, desc, price, doctorIdsJson, imageUrl) {
+            document.getElementById('edit-id').value    = id;
+            document.getElementById('edit-name').value  = name;
+            document.getElementById('edit-desc').value  = desc;
+            document.getElementById('edit-price').value = price;
+
+            const editPreview  = document.getElementById('edit-preview');
+            const editUpText   = document.getElementById('edit-upload-text');
+            if (imageUrl && imageUrl.trim() !== '') {
+                editPreview.src   = contextPath + imageUrl;
+                editPreview.style.display = 'block';
+                editUpText.textContent = 'Đang dùng ảnh hiện tại — chọn mới để thay thế';
+            } else {
+                editPreview.style.display = 'none';
+                editUpText.textContent = 'Chọn ảnh mới để thay thế';
+            }
+
+            const checkboxes = document.querySelectorAll('.edit-doc-cb');
+            checkboxes.forEach(cb => cb.checked = false);
+            try {
+                const selectedIds = JSON.parse(doctorIdsJson || '[]');
+                selectedIds.forEach(docId => {
+                    checkboxes.forEach(cb => { if (cb.value == docId) cb.checked = true; });
+                });
+            } catch(e) {}
+
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function previewImage(input, previewId, textId) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById(previewId);
+                img.src = e.target.result;
+                img.style.display = 'block';
+                document.getElementById(textId).textContent = file.name;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function filterServices() {
+            const filter = document.getElementById('serviceSearch').value.toLowerCase().trim();
+            const rows   = document.querySelectorAll("table tbody tr");
+            rows.forEach(row => {
+                const name = (row.cells[2] ? row.cells[2].textContent : '').toLowerCase();
+                const desc = (row.cells[3] ? row.cells[3].textContent : '').toLowerCase();
+                row.style.display = (name.includes(filter) || desc.includes(filter)) ? '' : 'none';
+            });
+        }
+
+        window.addEventListener('click', function(event) {
+            let addModal = document.getElementById('addModal');
+            let editModal = document.getElementById('editModal');
+            if (event.target == addModal) closeModal('addModal');
+            if (event.target == editModal) closeModal('editModal');
+            
+            const searchMenu = document.getElementById('searchDropdown');
+            const userMenu = document.getElementById('userDropdown');
+            if (searchMenu) searchMenu.style.display = 'none';
+            if (userMenu) userMenu.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

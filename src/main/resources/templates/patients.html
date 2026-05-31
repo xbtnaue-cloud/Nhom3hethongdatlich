@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Bệnh nhân</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <th:block th:replace="~{sidebar :: sidebar-style}"></th:block>
+
+    <style>
+        /* ===== TOÀN BỘ CSS GLASSMORPHISM ĐƯỢC LÀM SẠCH VÀ GIỮ NGUYÊN VẸN 100% ===== */
+        html, body { scrollbar-width: none; -ms-overflow-style: none; }
+        body::-webkit-scrollbar { display: none; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --accent:       #00d4ff; --accent-glow:  rgba(0, 212, 255, 0.35); --accent-deep:  #0072ff; --success:      #34d399; --warning:      #facc15; --danger:       #ff6b6b;
+            --glass-bg:     rgba(15, 23, 42, 0.25); --glass-border: rgba(255, 255, 255, 0.08); --glass-top:    rgba(255, 255, 255, 0.45); --glass-left:   rgba(255, 255, 255, 0.2);
+            --text:         #ffffff; --text-soft:    rgba(255, 255, 255, 0.6);
+            --shadow-heavy: 0 40px 100px rgba(0, 0, 0, 0.8), 0 10px 20px rgba(0, 0, 0, 0.5); --inset-shine:  inset 0 1px 1px rgba(255, 255, 255, 0.3);
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; background: radial-gradient(at 0% 0%, rgba(0, 212, 255, 0.2) 0px, transparent 45%), radial-gradient(at 100% 0%, rgba(0, 114, 255, 0.15) 0px, transparent 40%), #04070d; background-attachment: fixed; color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; position: relative; }
+        body::before { content: ""; position: fixed; top: -20%; left: -20%; width: 140%; height: 140%; background: radial-gradient(circle, rgba(0, 212, 255, 0.04) 0%, transparent 60%); animation: liquidMove 20s infinite alternate ease-in-out; z-index: -1; pointer-events: none; }
+        @keyframes liquidMove { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-10%, -5%) scale(1.1); } }
+
+        .main { margin-left: 250px; padding: 40px; width: calc(100% - 250px); }
+        .glass { border-radius: 24px; padding: 30px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 2px solid rgba(255, 255, 255, 0.5); border-left: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6), inset 0 1px 3px rgba(255, 255, 255, 0.2); transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+        .glass:hover { background: rgba(255, 255, 255, 0.05); border-top: 2px solid rgba(255, 255, 255, 0.7); box-shadow: 0 50px 120px rgba(0, 0, 0, 0.8); }
+
+        th { padding: 20px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important; text-align: left; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800; }
+        .search-container { position: relative; margin-bottom: 35px; width: 400px; }
+        .search-input { width: 100%; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); border-radius: 2.5rem; border: 1px solid rgba(255, 255, 255, 0.1); border-top: 2px solid rgba(255, 255, 255, 0.5); border-left: 1px solid rgba(255, 255, 255, 0.2); padding: 14px 25px 14px 50px; color: #fff; outline: none; font-size: 14px; font-weight: 500; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.2); transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+        .search-input:focus { background: rgba(255, 255, 255, 0.1); border-top: 2px solid rgba(255, 255, 255, 0.8); box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 212, 255, 0.25), inset 0 1px 3px rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+        .search-icon { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); color: var(--accent); opacity: 0.8; font-size: 16px; pointer-events: none; transition: 0.3s; }
+        .search-input:focus + .search-icon { opacity: 1; text-shadow: 0 0 10px var(--accent); }
+
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 18px; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: rgba(255,255,255,0.9); }
+        .action-group { display: flex; gap: 8px; justify-content: center; }
+        
+        .btn-mini { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 18px; min-width: 90px; border-radius: 2.5rem; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px) saturate(160%); -webkit-backdrop-filter: blur(15px) saturate(160%); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 2px solid rgba(255, 255, 255, 0.4); border-left: 1px solid rgba(255, 255, 255, 0.15); color: #fff !important; text-decoration: none; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2); transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); cursor: pointer; }
+        .btn-mini:hover { transform: translateY(-3px) scale(1.05); background: rgba(255, 255, 255, 0.15); border-top: 2px solid rgba(255, 255, 255, 0.8); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 255, 255, 0.1); color: #fff !important; }
+        .btn-history { border-color: rgba(0, 212, 255, 0.3); }
+        .btn-history i { color: var(--accent); }
+        .btn-history:hover { box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6), 0 0 15px var(--accent-glow); border-color: var(--accent); }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 20, 30, 0.4); backdrop-filter: blur(8px) saturate(150%); -webkit-backdrop-filter: blur(8px) saturate(150%); display: none; align-items: center; justify-content: center; z-index: 2000; transition: all 0.3s ease; }
+        .modal-content { width: 100%; max-width: 500px; padding: 35px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(45px) saturate(210%); -webkit-backdrop-filter: blur(45px) saturate(210%); border-radius: 32px; border: 1px solid rgba(255, 255, 255, 0.1); border-top: 2px solid rgba(255, 255, 255, 0.55); border-left: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 50px 100px rgba(0, 0, 0, 0.7), inset 0 1px 3px rgba(255, 255, 255, 0.2); position: relative; overflow: hidden; }
+        @keyframes modalSlideUp { from { opacity: 0; transform: translateY(30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .modal-content.animate-popup { animation: modalSlideUp 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
+        
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .modal-header h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: #fff; }
+        .close-btn { font-size: 28px; cursor: pointer; color: var(--text-soft); transition: 0.3s; }
+        .close-btn:hover { color: var(--danger); transform: rotate(90deg); }
+        .modal-form .input-group { margin-bottom: 18px; }
+        .modal-form label { display: block; margin-bottom: 10px; margin-left: 15px; font-size: 11px; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; text-align: left; }
+        .modal-form input { width: 100%; padding: 14px 22px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px) saturate(180%); -webkit-backdrop-filter: blur(15px) saturate(180%); border-radius: 2.5rem; border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1.5px solid rgba(255, 255, 255, 0.4); border-left: 1px solid rgba(255, 255, 255, 0.15); color: #fff; outline: none; font-size: 14px; font-weight: 500; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1); transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1); }
+        .modal-form input:focus { background: rgba(255, 255, 255, 0.1); border-top: 1.5px solid rgba(255, 255, 255, 0.8); border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 212, 255, 0.2), inset 0 1px 3px rgba(255, 255, 255, 0.2); transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{sidebar :: sidebar}"></div>
+
+    <div class="main">
+        <div class="page-header" style="margin-bottom: 30px;">
+            <h2 style="font-size: 28px; font-weight: 800;">Quản lý bệnh nhân</h2>
+            <p style="opacity: 0.6; font-size: 14px;">Gõ để tìm kiếm nhanh hồ sơ bệnh nhân</p>
+        </div>
+
+        <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Nhập tên hoặc số điện thoại...">
+        </div>
+
+        <div class="glass">
+            <table id="patientTable">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">ID</th>
+                        <th>Thông tin bệnh nhân</th>
+                        <th>Số điện thoại</th>
+                        <th style="text-align: center;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p : ${listP}">
+                        <td style="opacity: 0.5;" th:text="'#' + ${p.userID}">#12</td>
+                        <td class="patient-info">
+                            <div class="patient-name" style="font-weight: 700;" th:text="${p.fullName}">Tên bệnh nhân</div>
+                            <div style="font-size: 12px; opacity: 0.6;" th:text="${p.email}">email@domain.com</div>
+                        </td>
+                        <td class="patient-phone" th:text="${p.phone}">09xxxxxxx</td>
+                        <td style="text-align: center;">
+                            <div class="action-group">
+                                <a href="javascript:void(0)" class="btn-mini btn-history" 
+                                   style="border-color: var(--accent); color: var(--accent);"
+                                   th:onclick="openHistoryModal([[${p.userID}]], [[${p.fullName}]], event)">
+                                    <i class="fa-solid fa-file-medical"></i> Hồ sơ
+                                </a>
+                                
+                                <a href="javascript:void(0)" class="btn-mini" 
+                                   th:onclick="openEditModal([[${p.userID}]], [[${p.fullName}]], [[${p.email}]], [[${p.phone}]])">
+                                    <i class="fa-solid fa-pen-to-square"></i> Sửa
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <tr th:if="${#lists.isEmpty(listP)}">
+                        <td colspan="4" style="text-align: center; color: rgba(255,255,255,0.3); padding: 40px 0;">Hiện tại chưa có dữ liệu bệnh nhân nào trong hệ thống.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="editPatientModal" class="modal-overlay">
+        <div class="glass modal-content animate-popup">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-user-pen" style="color: var(--accent); margin-right: 10px;"></i>Chỉnh sửa bệnh nhân</h3>
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+            </div>
+            
+            <form th:action="@{/edit-patient}" method="post" class="modal-form">
+                <input type="hidden" name="id" id="edit-id">
+                
+                <div class="input-group">
+                    <label>Họ và Tên</label>
+                    <input type="text" name="name" id="edit-name" required>
+                </div>
+                
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" name="email" id="edit-email" required>
+                </div>
+                
+                <div class="input-group">
+                    <label>Số điện thoại</label>
+                    <input type="text" name="phone" id="edit-phone" required>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 25px;">
+                    <button type="button" class="btn-mini" onclick="closeModal()" style="flex: 1; justify-content: center; height: 45px;">HỦY</button>
+                    <button type="submit" class="btn-mini" style="flex: 2; justify-content: center; height: 45px; background: var(--accent); color: #000; border: none;">LƯU THAY ĐỔI</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal-overlay">
+        <div class="glass modal-content animate-popup" style="max-width: 700px;"> 
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-notes-medical" style="color: var(--accent); margin-right: 10px;"></i>Hồ sơ: <span id="history-patient-name"></span></h3>
+                <span class="close-btn" onclick="closeHistoryModal()">&times;</span>
+            </div>
+            
+            <div style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ngày</th>
+                            <th>Dịch vụ</th>
+                            <th>Bác sĩ</th>
+                            <th style="text-align: right;">Giá tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-data"></tbody>
+                </table>
+            </div>
+
+            <div style="text-align: right; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                <span style="opacity: 0.7; font-size: 14px;">TỔNG CHI TIÊU: </span>
+                <span id="history-total" style="color: var(--accent); font-weight: 800; font-size: 20px;">0 VNĐ</span>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        // 🌟 DÙNG THYMELEAF: Khởi tạo context path động chống lỗi đường dẫn khi deploy
+        var contextPath = /*[[@{/}]]*/ '/';
+        if (contextPath === '/') contextPath = '';
+
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            let value = this.value.toLowerCase();
+            let rows = document.querySelectorAll('#patientTable tbody tr');
+
+            rows.forEach(row => {
+                let nameEl = row.querySelector('.patient-name');
+                let phoneEl = row.querySelector('.patient-phone');
+                if(!nameEl || !phoneEl) return;
+
+                let name = nameEl.textContent.toLowerCase();
+                let phone = phoneEl.textContent.toLowerCase();
+
+                if (name.includes(value) || phone.includes(value)) {
+                    row.style.display = ""; 
+                } else {
+                    row.style.display = "none"; 
+                }
+            });
+        });
+        
+        function openEditModal(id, name, email, phone) {
+            document.getElementById('edit-id').value = id;
+            document.getElementById('edit-name').value = name;
+            document.getElementById('edit-email').value = email;
+            document.getElementById('edit-phone').value = phone;
+
+            document.getElementById('editPatientModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('editPatientModal').style.display = 'none';
+        }
+        
+        function openHistoryModal(id, name, event) {
+            document.getElementById('history-patient-name').innerText = name;
+            const historyData = document.getElementById('history-data');
+            
+            let row = event.target.closest('tr');
+            let phone = row.querySelector('.patient-phone').innerText.trim();
+
+            document.getElementById('historyModal').style.display = 'flex';
+            historyData.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">Đang tải...</td></tr>';
+
+            // 🌟 ĐỒNG BỘ: Gọi API dynamic qua biến contextPath của Spring Boot
+            fetch(contextPath + 'patient-detail?id=' + id + '&phone=' + encodeURIComponent(phone) + '&ajax=true')
+                .then(response => response.json())
+                .then(data => {
+                    let html = '';
+                    let total = 0;
+                    if (!data || data.length === 0) {
+                        html = '<tr><td colspan="4" style="text-align:center; opacity:0.5; padding: 20px;">Chưa có lịch sử điều trị.</td></tr>';
+                    } else {
+                        data.forEach(item => {
+                            total += parseFloat(item.price);
+                            html += '<tr>' +
+                                '<td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05);">' + (item.appointmentDate || "N/A") + '</td>' +
+                                '<td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-weight: 600;">' + (item.serviceName || "Dịch vụ") + '</td>' +
+                                '<td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05);">' + (item.dentistName || "Bác sĩ") + '</td>' +
+                                '<td style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: right; color: var(--accent); font-weight: 700;">' + 
+                                    item.price.toLocaleString() + ' VNĐ' + 
+                                '</td>' +
+                            '</tr>';
+                        });
+                    }
+                    historyData.innerHTML = html;
+                    document.getElementById('history-total').innerText = total.toLocaleString() + ' VNĐ';
+                })
+                .catch(err => {
+                    console.error("Lỗi AJAX:", err);
+                    historyData.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--danger); padding:20px;">Không thể tải dữ liệu lịch sử.</td></tr>';
+                });
+        }
+        
+        function closeHistoryModal() {
+            document.getElementById('historyModal').style.display = 'none';
+        }
+
+        // Đóng modal khi click ra ngoài vùng kính
+        window.addEventListener('click', function(event) {
+            let editModal = document.getElementById('editPatientModal');
+            let historyModal = document.getElementById('historyModal');
+            if (event.target == editModal) closeModal();
+            if (event.target == historyModal) closeHistoryModal();
+            
+            // Xử lý đóng menu sidebar nếu có dropdown ẩn
+            const searchMenu = document.getElementById('searchDropdown');
+            const userMenu = document.getElementById('userDropdown');
+            if (searchMenu) searchMenu.style.display = 'none';
+            if (userMenu) userMenu.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

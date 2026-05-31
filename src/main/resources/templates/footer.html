@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="[http://www.thymeleaf.org](http://www.thymeleaf.org)">
+<head>
+    <meta charset="UTF-8">
+    <style th:fragment="footer-style">
+        /* ===== TOÀN BỘ CSS FOOTER LIQUID GLASS ĐƯỢC LÀM SẠCH VÀ GIỮ NGUYÊN ===== */
+        :root {
+            --f-glass: rgba(255, 255, 255, 0.02);
+            --f-border: rgba(255, 255, 255, 0.08);
+            --f-accent: #00d4ff;
+        }
+
+        .main-footer {
+            padding: 0 40px 30px; 
+            margin-top: 60px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .footer-glass-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.01) !important;
+            backdrop-filter: blur(50px) saturate(220%) !important;
+            -webkit-backdrop-filter: blur(50px) saturate(220%);
+            border-radius: 4rem; 
+            padding: 70px 60px 40px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-top: 3.5px solid rgba(255, 255, 255, 0.6) !important;
+            border-left: 2px solid rgba(255, 255, 255, 0.3) !important;
+            box-shadow: 
+                0 60px 120px rgba(0, 0, 0, 0.7),
+                inset 0 1px 3px rgba(255, 255, 255, 0.2);
+            transition: all 0.5s ease;
+        }
+
+        .footer-glass-container::after {
+            content: '';
+            position: absolute;
+            bottom: -150px; left: 50%;
+            transform: translateX(-50%);
+            width: 600px; height: 300px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1), transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 0.8fr 0.8fr 1.1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-logo-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .footer-logo-box { width: 42px; height: 42px; background: linear-gradient(135deg, var(--f-accent), #0072ff); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3); }
+        .footer-logo-text { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; letter-spacing: 1px; color: #fff; }
+        .footer-logo-text span { color: var(--f-accent); }
+        .footer-brand p { font-size: 13px; color: rgba(255, 255, 255, 0.45); line-height: 1.7; max-width: 280px; text-align: left; }
+        .footer-col h4 { font-size: 13px; font-weight: 600; margin-bottom: 25px; color: #fff; text-transform: uppercase; letter-spacing: 1.5px; }
+        .footer-links { list-style: none; padding: 0; margin: 0; }
+        .footer-links li { margin-bottom: 12px; }
+        .footer-links a { text-decoration: none; color: rgba(255, 255, 255, 0.4); font-size: 13px; transition: all 0.3s ease; }
+        .footer-links a:hover { color: var(--f-accent); transform: translateX(5px); display: inline-block; }
+        .footer-contact-item { display: flex; gap: 12px; margin-bottom: 15px; font-size: 13px; color: rgba(255, 255, 255, 0.45); align-items: flex-start; }
+        .footer-contact-item i { color: var(--f-accent); font-size: 14px; margin-top: 3px; }
+        .footer-social-wrap { display: flex; gap: 10px; margin-top: 25px; }
+        .soc-item { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.4); text-decoration: none; transition: 0.4s; }
+        .soc-item:hover { background: rgba(0,212,255,0.1); border-color: var(--f-accent); color: var(--f-accent); transform: translateY(-3px); }
+        .footer-bottom { padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.05); display: flex; justify-content: space-between; align-items: center; }
+        .copyright { font-size: 12px; color: rgba(255, 255, 255, 0.2); }
+    </style>
+</head>
+<body>
+
+    <footer th:fragment="footer" class="main-footer">
+        <div class="footer-glass-container">
+            <div class="footer-grid">
+                
+                <div class="footer-brand">
+                    <div class="footer-logo-wrap">
+                        <div class="footer-logo-box"><i class="fa-solid fa-tooth"></i></div>
+                        <div class="footer-logo-text">NHA KHOA<span>NAU</span></div>
+                    </div>
+                    <p>Hệ thống phòng khám nha khoa chất lượng cao với sứ mệnh mang lại nụ cười hoàn hảo và sức khỏe răng miệng tối ưu.</p>
+                    <div class="footer-social-wrap">
+                        <a href="#" class="soc-item"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="soc-item"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="soc-item"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="#" class="soc-item"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Dịch Vụ</h4>
+                    <ul class="footer-links">
+                        <li><a th:href="@{/service-list}">Cấy Ghép Implant</a></li>
+                        <li><a th:href="@{/service-list}">Niềng Răng</a></li>
+                        <li><a th:href="@{/service-list}">Tẩy Trắng Răng</a></li>
+                        <li><a th:href="@{/service-list}">Bọc Răng Sứ</a></li>
+                        <li><a th:href="@{/service-list}">Điều Trị Tủy</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Về Chúng Tôi</h4>
+                    <ul class="footer-links">
+                        <li><a th:href="@{/dentist-list}">Đội Ngũ Bác Sĩ</a></li>
+                        <li><a th:href="@{/index} + '#facilities'">Cơ Sở Vật Chất</a></li>
+                        <li><a th:href="@{/index} + '#awards'">Chứng Nhận</a></li>
+                        <li><a href="#">Blog Sức Khỏe</a></li>
+                        <li><a href="#">Tuyển Dụng</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Liên Hệ</h4>
+                    <div class="footer-contact-item">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>📍 51 Lý Tự Trọng, Nghệ An</span>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fa-solid fa-phone"></i>
+                        <span>📞 1800 6868</span>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fa-solid fa-envelope"></i>
+                        <span>✉️ lienhe@nhakhoanau.vn</span>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fa-solid fa-clock"></i>
+                        <span>🕒 7:00 – 21:00 hàng ngày</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="footer-bottom">
+                <p class="copyright">&copy; 2026 NHA KHOA NAU. Bảo lưu mọi quyền.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

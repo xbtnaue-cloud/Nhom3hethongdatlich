@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Đặt Lịch Khám Nha Khoa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* ===== TOÀN BỘ CSS LIQUID GLASS ĐƯỢC GIỮ NGUYÊN VẸN 100% ===== */
+        :root { 
+            --bg-dark: #050b18; --bg-accent: #0a162f; --accent: #00E5FF;
+            --glass-bg: rgba(255, 255, 255, 0.03); --glass-border: rgba(255, 255, 255, 0.12); --text-light: #ffffff;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at 20% 20%, #00E5FF22, transparent 40%), radial-gradient(circle at 80% 80%, #00E5FF22, transparent 40%), linear-gradient(135deg, #020617, #050b18); background-attachment: fixed; color: var(--text-light); min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow-x: hidden; padding: 20px; }
+        .toast-wrap { position: fixed; top: 0; left: 50%; transform: translateX(-50%) translateY(-120px); z-index: 9999; pointer-events: none; transition: transform 0.55s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.55s cubic-bezier(0.23, 1, 0.32, 1); opacity: 0; }
+        .toast-wrap.show { transform: translateX(-50%) translateY(28px); opacity: 1; pointer-events: auto; }
+        .toast-wrap.hide { transform: translateX(-50%) translateY(-120px); opacity: 0; }
+        .toast-inner { display: flex; align-items: center; gap: 14px; padding: 14px 26px 14px 18px; min-width: 340px; max-width: 480px; border-radius: 100px; background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(40px) saturate(200%) brightness(1.15); -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.15); border: 1px solid rgba(255, 255, 255, 0.1); border-left: 1px solid rgba(255, 255, 255, 0.18); box-shadow: 0 24px 56px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.12); }
+        .toast-inner.is-success { border-top: 2px solid rgba(52, 211, 153, 0.7); }
+        .toast-inner.is-error { border-top: 2px solid rgba(255, 95, 95, 0.7); }
+        .toast-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+        .is-success .toast-icon { background: rgba(52, 211, 153, 0.14); color: #34d399; box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.2); }
+        .is-error .toast-icon { background: rgba(255, 95, 95, 0.14); color: #ff5f5f; box-shadow: 0 0 0 1px rgba(255, 95, 95, 0.2); }
+        .toast-body { flex: 1; }
+        .toast-label { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 3px; }
+        .is-success .toast-label { color: rgba(52, 211, 153, 0.7); }
+        .is-error .toast-label { color: rgba(255, 95, 95, 0.7); }
+        .toast-text { font-size: 13.5px; font-weight: 600; line-height: 1.4; color: rgba(255, 255, 255, 0.88); }
+        .container { width: 100%; max-width: 1000px; display: flex; background: rgba(255, 255, 255, 0.01) !important; backdrop-filter: blur(50px) saturate(210%) brightness(1.1) !important; border-radius: 4.5rem; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 3px solid rgba(255, 255, 255, 0.6) !important; border-left: 1.5px solid rgba(255, 255, 255, 0.25) !important; overflow: hidden; box-shadow: 0 60px 120px rgba(0, 0, 0, 0.7); transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
+        .form-section { flex: 1.3; padding: 50px; border-right: 1px solid rgba(255,255,255,0.1); }
+        .summary-section { flex: 0.7; padding: 50px; background: rgba(255, 255, 255, 0.02); display: flex; flex-direction: column; justify-content: center; }
+        .header-wrapper { display: flex; align-items: center; gap: 25px; margin-bottom: 40px; padding-left: 5px; }
+        .back-btn-inline { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1.5px solid rgba(255, 255, 255, 0.4); border-radius: 50%; color: var(--text-light); text-decoration: none; font-size: 16px; transition: all 0.3s ease; flex-shrink: 0; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); }
+        .back-btn-inline:hover { background: rgba(0, 229, 255, 0.2); border-top-color: var(--accent); transform: scale(1.1); color: var(--accent); }
+        .form-section h2 { margin-bottom: 0 !important; font-weight: 800; letter-spacing: 0.5px; font-size: 32px; text-transform: uppercase; color: #ffffff; white-space: nowrap; }
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px 40px; align-items: start; margin-bottom: 30px; }
+        .form-group { display: flex; flex-direction: column; width: 100%; }
+        label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--accent); margin-bottom: 6px; display: block; font-weight: 700; }
+        input, select { width: 100% !important; height: 50px; padding: 0 20px; background: rgba(255, 255, 255, 0.02) !important; backdrop-filter: blur(15px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 1.5px solid rgba(255, 255, 255, 0.5) !important; border-left: 1px solid rgba(255, 255, 255, 0.2) !important; border-radius: 1.2rem; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13.5px; outline: none; transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1); appearance: none; -webkit-appearance: none; }
+        select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='rgba(255,255,255,0.3)' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 38px; }
+        select option { background: #0a162f; color: #fff; }
+        input::placeholder { color: rgba(255,255,255,0.22); }
+        input:focus, select:focus { background: rgba(255, 255, 255, 0.08) !important; border-top-color: var(--accent) !important; transform: translateY(-2px) scale(1.02); box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 15px rgba(0,229,255,0.2), inset 0 1px 3px rgba(255,255,255,0.3) !important; }
+        .summary-item { margin-bottom: 22px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .summary-label { font-size: 9px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; }
+        .summary-value { font-size: 15px; font-weight: 600; margin-top: 4px; color: #fff; line-height: 1.4; }
+        .btn-submit { width: 100%; padding: 16px; background: var(--accent); color: #001a21; border: none; border-radius: 18px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.4s; margin-top: 25px; box-shadow: 0 12px 25px rgba(0, 212, 255, 0.25); text-transform: uppercase; letter-spacing: 1px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 18px 35px rgba(0, 212, 255, 0.4); filter: brightness(1.1); }
+        ::-webkit-calendar-picker-indicator { filter: invert(1) brightness(1.5); cursor: pointer; }
+        @media (max-width: 850px) { .container { flex-direction: column; max-width: 500px; border-radius: 2.5rem; } .summary-section { order: -1; padding: 35px; border-bottom: 1px solid rgba(255,255,255,0.1); } .form-section { padding: 35px; } .input-grid { grid-template-columns: 1fr; gap: 20px; } .form-section h2 { font-size: 24px; } }
+    </style>
+</head>
+<body>
+
+<th:block th:if="${mess != null}">
+    <span id="srv-mess" th:text="${mess}" style="display:none"></span>
+</th:block>
+<th:block th:if="${error != null}">
+    <span id="srv-error" th:text="${error}" style="display:none"></span>
+</th:block>
+
+<div class="toast-wrap" id="toastWrap">
+    <div class="toast-inner" id="toastInner">
+        <div class="toast-icon" id="toastIcon"></div>
+        <div class="toast-body">
+            <div class="toast-label" id="toastLabel"></div>
+            <div class="toast-text"  id="toastText"></div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="form-section">
+        <div class="header-wrapper">
+            <a th:href="@{/index}" class="back-btn-inline" title="Quay lại">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+            <h2>Đặt lịch khám</h2>
+        </div>
+
+        <form th:action="@{/booking}" method="post">
+            <div class="input-grid">
+                
+                <div class="form-group">
+                    <label>1. Chọn dịch vụ</label>
+                    <select name="serviceID" id="serviceID" required onchange="loadDentists(this.value)">
+                        <option value="">Chọn dịch vụ</option>
+                        <option th:each="s : ${listS}" th:value="${s.serviceID}" th:text="${s.serviceName}"></option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>2. Nha sĩ chuyên khoa</label>
+                    <select name="dentistID" id="dentistID" required
+                            onchange="updateSummary('summary-dentist', this.options[this.selectedIndex].text)">
+                        <option value="">Vui lòng chọn dịch vụ trước</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>3. Ngày hẹn</label>
+                    <input type="date" name="date" id="appointmentDate" required
+                           onchange="updateSummary('summary-date', this.value)">
+                </div>
+
+                <div class="form-group">
+                    <label>4. Giờ hẹn</label>
+                    <input type="time" name="time" required
+                           onchange="updateSummary('summary-time', this.value)">
+                </div>
+
+                <div class="form-group">
+                    <label>Họ và Tên</label>
+                    <input type="text" name="fullName"
+                           th:value="${session.acc != null ? session.acc.fullName : ''}"
+                           placeholder="Tên người khám" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Số điện thoại</label>
+                    <input type="tel" name="phone"
+                           th:value="${session.acc != null ? session.acc.phone : ''}"
+                           placeholder="SĐT liên hệ" required>
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-submit">Xác nhận đặt lịch</button>
+        </form>
+    </div>
+
+    <div class="summary-section">
+        <h3 style="margin-bottom: 25px; font-weight: 600; font-size: 18px;">Chi tiết lịch hẹn</h3>
+
+        <div class="summary-item">
+            <div class="summary-label">Dịch vụ</div>
+            <div class="summary-value" id="summary-service">Chưa chọn</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Nha sĩ</div>
+            <div class="summary-value" id="summary-dentist">Chưa chọn</div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Thời gian</div>
+            <div class="summary-value">
+                <span id="summary-time">--:--</span> | <span id="summary-date">--/--/----</span>
+            </div>
+        </div>
+
+        <div style="background:rgba(0,212,255,0.05);padding:15px;border-radius:12px;border:1px solid rgba(0,212,255,0.1);">
+            <p style="font-size:10.5px;color:var(--accent);line-height:1.5;margin:0;">
+                Hệ thống sẽ gửi tin nhắn xác nhận sau khi Nha Sĩ phê duyệt lịch hẹn này.
+            </p>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /* Ép đường dẫn ngữ cảnh bằng Thymeleaf tránh lỗi vỡ đường dẫn Ajax API */
+    var CONTEXT_PATH = /*[[@{/}]]*/ '/';
+    if (CONTEXT_PATH === '/') CONTEXT_PATH = '';
+
+    /* ===== TOAST ===== */
+    function showToast(message, type) {
+        var wrap  = document.getElementById('toastWrap');
+        var inner = document.getElementById('toastInner');
+        var icon  = document.getElementById('toastIcon');
+        var label = document.getElementById('toastLabel');
+        var text  = document.getElementById('toastText');
+
+        inner.className = 'toast-inner';
+        wrap.className  = 'toast-wrap';
+
+        if (type === 'success') {
+            inner.classList.add('is-success');
+            icon.innerHTML  = '<i class="fa-solid fa-check"></i>';
+            label.textContent = 'Thành công';
+        } else {
+            inner.classList.add('is-error');
+            icon.innerHTML  = '<i class="fa-solid fa-triangle-exclamation"></i>';
+            label.textContent = 'Lưu ý';
+        }
+        text.textContent = message;
+
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+                wrap.classList.add('show');
+            });
+        });
+
+        setTimeout(function() {
+            wrap.className = 'toast-wrap hide';
+            setTimeout(function() {
+                wrap.className = 'toast-wrap';
+            }, 600);
+        }, 5000);
+    }
+
+    /* ===== SUMMARY ===== */
+    function updateSummary(id, value) {
+        if (!value) return;
+        if (id === 'summary-date') {
+            var ti = document.querySelector('input[name="time"]');
+            var today = new Date().toISOString().split('T')[0];
+            if (value === today) {
+                var n = new Date();
+                ti.setAttribute('min', String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0'));
+            } else {
+                ti.removeAttribute('min');
+            }
+            var p = value.split('-');
+            if (p.length === 3) value = p[2] + '/' + p[1] + '/' + p[0];
+        }
+        var t = document.getElementById(id);
+        if (t) t.innerText = value;
+    }
+
+    /* ===== LOAD NHA SĨ ===== */
+    function loadDentists(serviceID) {
+        var sel = document.getElementById('serviceID');
+        if (sel.selectedIndex > 0)
+            updateSummary('summary-service', sel.options[sel.selectedIndex].text);
+
+        if (serviceID) {
+            // 🌟 ĐỒNG BỘ: Gọi API dynamic qua biến CONTEXT_PATH
+            fetch(CONTEXT_PATH + '/getDentists?serviceID=' + serviceID)
+                .then(function(r) { return r.text(); })
+                .then(function(data) {
+                    var ds = document.getElementById('dentistID');
+                    ds.innerHTML = data;
+                    if (window.pendingDentistID) {
+                        ds.value = window.pendingDentistID;
+                        if (ds.selectedIndex > 0)
+                            updateSummary('summary-dentist', ds.options[ds.selectedIndex].text);
+                        window.pendingDentistID = null;
+                    } else {
+                        document.getElementById('summary-dentist').innerText = 'Chưa chọn';
+                    }
+                })
+                .catch(function(e) { console.error('Lỗi Ajax:', e); });
+        } else {
+            document.getElementById('dentistID').innerHTML = '<option value="">-- Vui lòng chọn dịch vụ trước --</option>';
+            document.getElementById('summary-dentist').innerText = 'Chưa chọn';
+        }
+    }
+
+    /* ===== INIT ===== */
+    document.addEventListener('DOMContentLoaded', function() {
+        var eEl = document.getElementById('srv-error');
+        var mEl = document.getElementById('srv-mess');
+        if (eEl && eEl.textContent.trim()) showToast(eEl.textContent.trim(), 'error');
+        if (mEl && mEl.textContent.trim()) showToast(mEl.textContent.trim(), 'success');
+
+        var di = document.getElementById('appointmentDate');
+        if (di) di.setAttribute('min', new Date().toISOString().split('T')[0]);
+
+        var p   = new URLSearchParams(window.location.search);
+        var sID = p.get('serviceID'), dID = p.get('dentistID');
+        var t   = p.get('time'),      d   = p.get('date');
+        if (d) { di.value = d; updateSummary('summary-date', d); }
+        if (t) { var ti = document.querySelector('input[name="time"]'); if(ti){ ti.value = t; updateSummary('summary-time', t); } }
+        if (sID) {
+            document.getElementById('serviceID').value = sID;
+            window.pendingDentistID = dID;
+            loadDentists(sID);
+        } else if (dID) {
+            window.pendingDentistID = dID;
+        }
+    });
+</script>
+
+</body>
+</html>

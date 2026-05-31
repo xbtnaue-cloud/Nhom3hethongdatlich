@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hộp thư hỗ trợ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <th:block th:replace="~{sidebar :: sidebar-style}"></th:block>
+
+    <style>
+        /* ===== TOÀN BỘ CSS CHAT WRAPPER LIQUID GLASS ĐƯỢC GIỮ NGUYÊN VẸN VÀ LÀM SẠCH ===== */
+        html, body { scrollbar-width: none; -ms-overflow-style: none; overflow: hidden; }
+        body::-webkit-scrollbar { display: none; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --accent: #00d4ff; --accent-glow: rgba(0, 212, 255, 0.35); --accent-deep: #0072ff; --success: #34d399; --warning: #facc15; --danger: #ff6b6b; --glass-bg: rgba(15, 23, 42, 0.25); --glass-border: rgba(255, 255, 255, 0.08); --glass-top: rgba(255, 255, 255, 0.45); --glass-left: rgba(255, 255, 255, 0.2); --text: #ffffff; --text-soft: rgba(255, 255, 255, 0.6); --shadow-heavy: 0 40px 100px rgba(0, 0, 0, 0.8), 0 10px 20px rgba(0, 0, 0, 0.5); --inset-shine: inset 0 1px 1px rgba(255, 255, 255, 0.3); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; background: radial-gradient(at 0% 0%, rgba(0, 212, 255, 0.2) 0px, transparent 45%), radial-gradient(at 100% 0%, rgba(0, 114, 255, 0.15) 0px, transparent 40%), #04070d; background-attachment: fixed; color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; position: relative; }
+        body::before { content: ""; position: fixed; top: -20%; left: -20%; width: 140%; height: 140%; background: radial-gradient(circle, rgba(0, 212, 255, 0.04) 0%, transparent 60%); animation: liquidMove 20s infinite alternate ease-in-out; z-index: -1; pointer-events: none; }
+        @keyframes liquidMove { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-10%, -5%) scale(1.1); } }
+        .main { margin-left: 250px; padding: 30px; width: calc(100% - 250px); display: flex; flex-direction: column; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+        .chat-wrapper { display: grid; grid-template-columns: 350px 1fr; background: rgba(255, 255, 255, 0.015); backdrop-filter: blur(40px) saturate(200%) brightness(1.1); -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(1.1); border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.12); border-top: 2.5px solid rgba(255, 255, 255, 0.6); border-left: 1px solid rgba(255, 255, 255, 0.25); box-shadow: 0 40px 100px rgba(0, 0, 0, 0.7), inset 0 1px 4px rgba(255, 255, 255, 0.3); height: calc(100vh - 120px); overflow: hidden; margin-top: 20px; }
+        .user-list { border-right: 1px solid rgba(255, 255, 255, 0.08); background: rgba(0, 0, 0, 0.1); overflow-y: auto; scrollbar-width: none; }
+        .user-item { padding: 20px 25px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); cursor: pointer; text-align: left; }
+        .user-item:hover { background: rgba(255, 255, 255, 0.05); }
+        .user-item.active { background: rgba(0, 212, 255, 0.08); border-left: 4px solid var(--accent); box-shadow: inset 10px 0 30px rgba(0, 212, 255, 0.1); }
+        .user-name { font-weight: 700; font-size: 15px; color: #fff; display: block; margin-bottom: 5px; }
+        .user-preview { font-size: 12px; color: rgba(255, 255, 255, 0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chat-view { display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.02); height: 100%; overflow: hidden; }
+        .chat-body { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; scrollbar-width: none; scroll-behavior: smooth; }
+        .bubble { max-width: 75%; padding: 16px 22px; border-radius: 20px; font-size: 14px; line-height: 1.6; position: relative; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; backdrop-filter: blur(20px) saturate(180%) brightness(1.1); -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(1.1); border: 1px solid rgba(255, 255, 255, 0.08); border-top: 1.5px solid rgba(255, 255, 255, 0.45); border-left: 1px solid rgba(255, 255, 255, 0.15); box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2); animation: bubbleFadeIn 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+        @keyframes bubbleFadeIn { from { opacity: 0; transform: translateY(15px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .bubble.patient { align-self: flex-start; background: rgba(15, 23, 42, 0.1) !important; border-bottom-left-radius: 4px; border-left: none; border-right: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.15); }
+        .bubble.doctor { align-self: flex-end; background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(0, 114, 255, 0.1)) !important; border-bottom-right-radius: 4px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 212, 255, 0.1), inset 0 1px 2px rgba(255, 255, 255, 0.3); }
+        .bubble span { display: block; margin-bottom: 6px; text-align: left; }
+        .chat-time { font-size: 10px; opacity: 0.6; font-weight: 500; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); text-align: left; }
+        .bubble.doctor .chat-time { color: var(--accent); opacity: 0.8; }
+        .chat-footer { padding: 25px; background: rgba(0, 0, 0, 0.3); display: flex; gap: 15px; align-items: center; }
+        .chat-input { flex: 1; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1.5px solid rgba(255, 255, 255, 0.4); border-radius: 100px; padding: 14px 25px; color: #fff; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.1); transition: 0.3s; }
+        .chat-input:focus { outline: none !important; background: rgba(255, 255, 255, 0.12); border-top-color: rgba(255, 255, 255, 0.8); border-left-color: rgba(255, 255, 255, 0.4); transform: translateY(-1px); }
+        .btn-send { background: var(--accent); border: none; width: 50px; height: 50px; border-radius: 50%; color: #fff; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px rgba(0, 212, 255, 0.4); display: flex; align-items: center; justify-content: center; }
+        .btn-send:hover { transform: scale(1.1) rotate(-10deg); filter: brightness(1.1); }
+    </style>
+</head>
+<body>
+
+    <div th:replace="~{sidebar :: sidebar}"></div>
+
+    <div class="main">
+        <div class="page-header">
+            <h2 style="font-size: 26px; font-weight: 800; letter-spacing: -0.5px;">Hộp thư hỗ trợ</h2>
+        </div>
+
+        <div th:if="${not #lists.isEmpty(listC)}" class="chat-wrapper">
+            
+            <div class="user-list" id="userList">
+                <div th:each="c, status : ${listC}" 
+                     th:class="'user-item ' + (${status.first} ? 'active' : '')" 
+                     th:id="'user-item-' + ${c.contactID}"
+                     th:onclick="'loadChat(\'' + ${c.contactID} + '\', this)'">
+                    <span class="user-name" th:text="${c.fullName}">Họ tên</span>
+                    <span style="font-size: 11px; color: var(--accent); display: block; margin-bottom: 5px; opacity: 0.8;">
+                        <i class="fa-regular fa-envelope"></i> <span th:text="${c.email}">email@domain.com</span>
+                    </span>
+                    <p class="user-preview" th:id="'preview-' + ${c.contactID}" th:text="${c.message}">Nội dung preview</p>
+                </div>
+            </div>
+
+            <div class="chat-view">
+                <div class="chat-body" id="chatBody">
+                    <div class="bubble patient">
+                        <span th:text="${listC[0].message}">Tin nhắn gốc</span>
+                        <div class="chat-time" th:text="${listC[0].createdAt}">Thời gian nhận</div>
+                    </div>
+                    
+                    <div th:if="${listC[0].replyMessage != null and !#strings.isEmpty(listC[0].replyMessage)}" class="bubble doctor">
+                        <span th:text="${listC[0].replyMessage}">Tin nhắn phản hồi từ hệ thống</span>
+                        <div class="chat-time" style="opacity: 0.8;">Bác sĩ đã phản hồi</div>
+                    </div>
+                </div>
+                
+                <div class="chat-footer">
+                    <input type="hidden" id="currentID" th:value="${listC[0].contactID}">
+                    <input type="text" id="replyInput" class="chat-input" 
+                           placeholder="Nhập lời tư vấn cho bệnh nhân..." autocomplete="off">
+                    <button type="button" onclick="sendReply()" class="btn-send">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div th:unless="${not #lists.isEmpty(listC)}" class="chat-wrapper" style="display: flex; align-items: center; justify-content: center; flex-direction: column; opacity: 0.5;">
+            <i class="fa-solid fa-comment-slash" style="font-size: 60px; margin-bottom: 20px;"></i>
+            <p>Chưa có lời nhắn nào từ hệ thống.</p>
+        </div>
+    </div>
+
+    <script th:inline="none">
+        // Khởi tạo dynamic context path để xử lý Ajax chuẩn chỉ
+        var CONTEXT_PATH = window.location.origin + window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1));
+        if (CONTEXT_PATH.includes('/admin-contacts') || CONTEXT_PATH.includes('/get-chat')) {
+            CONTEXT_PATH = window.location.origin;
+        }
+
+        // 1. Hàm Load Chat chi tiết (AJAX)
+        function loadChat(id, element) {
+            document.querySelectorAll('.user-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+
+            fetch('get-chat?id=' + id)
+                .then(response => response.json())
+                .then(data => {
+                    const chatBody = document.getElementById('chatBody');
+                    let html = '';
+                    
+                    data.forEach(msg => {
+                        const bubbleClass = (msg.role === 'Patient') ? 'patient' : 'doctor';
+                        html += `
+                            <div class="bubble ${bubbleClass}">
+                                <span>${msg.content}</span>
+                                <div class="chat-time">${msg.time}</div>
+                            </div>`;
+                    });
+                    
+                    chatBody.innerHTML = html;
+                    document.getElementById('currentID').value = id;
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                })
+                .catch(err => {
+                    console.error("Lỗi lấy dữ liệu:", err);
+                    document.getElementById('chatBody').innerHTML = '<p style="text-align:center; opacity:0.5; padding: 20px;">Lỗi tải tin nhắn.</p>';
+                });
+        }
+
+        // 2. Hàm Gửi Tin Nhắn (AJAX - Không load lại trang)
+        function sendReply() {
+            const id = document.getElementById('currentID').value;
+            const input = document.getElementById('replyInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            fetch('reply-contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                },
+                body: 'contactID=' + id + '&reply=' + encodeURIComponent(message)
+            })
+            .then(response => {
+                const chatBody = document.getElementById('chatBody');
+                const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                const newBubble = `
+                    <div class="bubble doctor">
+                        <span>${message}</span>
+                        <div class="chat-time" style="opacity: 0.8;">Vừa gửi - ${now}</div>
+                    </div>`;
+                
+                chatBody.insertAdjacentHTML('beforeend', newBubble);
+                input.value = ''; 
+                chatBody.scrollTop = chatBody.scrollHeight;
+                
+                const preview = document.getElementById('preview-' + id);
+                if(preview) preview.innerText = "Bạn: " + message;
+            })
+            .catch(err => {
+                console.error("Lỗi gửi tin nhắn:", err);
+                alert("Không thể gửi tin nhắn. Vui lòng kiểm tra kết nối!");
+            });
+        }
+
+        // 3. Sự kiện nhấn Enter để gửi nhanh lời tư vấn
+        document.addEventListener('DOMContentLoaded', function() {
+            const replyInput = document.getElementById('replyInput');
+            if (replyInput) {
+                replyInput.addEventListener("keypress", function(e) {
+                    if (e.key === "Enter") sendReply();
+                });
+            }
+
+            const cb = document.getElementById('chatBody');
+            if(cb) cb.scrollTop = cb.scrollHeight;
+        });
+
+        // 4. Hàm kiểm tra liên hệ mới và tin nhắn mới (Chạy ngầm Long-polling)
+        function fetchUpdates() {
+            const currentID = document.getElementById('currentID');
+            if (!currentID) return;
+            const activeId = currentID.value;
+
+            fetch('admin-fetch-updates') 
+                .then(response => response.json())
+                .then(data => {
+                    const userList = document.getElementById('userList');
+                    if (!userList) return;
+                    
+                    data.forEach((user, index) => {
+                        let existingItem = document.getElementById('user-item-' + user.contactID);
+                        
+                        if (!existingItem) {
+                            const newUserHTML = `
+                                <div class="user-item" id="user-item-${user.contactID}" onclick="loadChat('${user.contactID}', this)">
+                                    <span class="user-name">${user.fullName}</span>
+                                    <span style="font-size: 11px; color: var(--accent); display: block; margin-bottom: 5px; opacity: 0.8;">
+                                        <i class="fa-regular fa-envelope"></i> ${user.email}
+                                    </span>
+                                    <p class="user-preview" id="preview-${user.contactID}">${user.message}</p>
+                                </div>`;
+                            userList.insertAdjacentHTML('afterbegin', newUserHTML);
+                        } 
+                        
+                        if (user.contactID == activeId) {
+                            refreshChatBody(activeId);
+                        }
+                    });
+                }).catch(err => console.log("Gác cổng ngầm: Chưa có cập nhật mới."));
+        }
+
+        // Hàm cập nhật riêng khung chat không gây giật lag màn hình
+        function refreshChatBody(id) {
+            fetch('get-chat?id=' + id)
+                .then(res => res.json())
+                .then(data => {
+                    const chatBody = document.getElementById('chatBody');
+                    if(!chatBody) return;
+                    const currentBubbleCount = chatBody.querySelectorAll('.bubble').length;
+                    
+                    if (data.length !== currentBubbleCount) {
+                        let html = '';
+                        data.forEach(msg => {
+                            const bubbleClass = (msg.role === 'Patient') ? 'patient' : 'doctor';
+                            html += `
+                                <div class="bubble ${bubbleClass}">
+                                    <span>${msg.content}</span>
+                                    <div class="chat-time">${msg.time}</div>
+                                </div>`;
+                        });
+                        chatBody.innerHTML = html;
+                        chatBody.scrollTop = chatBody.scrollHeight;
+                    }
+                });
+        }
+
+        // Thiết lập quét chu kỳ ngầm 5 giây một lần
+        setInterval(fetchUpdates, 5000);
+
+        // Click ra bên ngoài đóng dropdown
+        window.addEventListener('click', function() {
+            const searchMenu = document.getElementById('searchDropdown');
+            const userMenu = document.getElementById('userDropdown');
+            if (searchMenu) searchMenu.style.display = 'none';
+            if (userMenu) userMenu.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

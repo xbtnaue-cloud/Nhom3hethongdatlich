@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập tài khoản</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* ===== TOÀN BỘ CSS LĂNG KÍNH THỦY TINH ĐƯỢC GIỮ NGUYÊN VẸN 100% KHÔNG CẮT BỎ CHỮ NÀO ===== */
+        :root {
+            --bg-dark: #050b18; 
+            --bg-accent: #0a162f;
+            --accent: #00E5FF;
+            --glass-bg: rgba(255, 255, 255, 0.03); 
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --text-light: #ffffff;
+        }
+
+        body {
+            margin: 0; padding: 0; font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at 20% 20%, rgba(0, 229, 255, 0.12), transparent 40%),
+                        radial-gradient(circle at 80% 80%, rgba(0, 229, 255, 0.1), transparent 40%),
+                        linear-gradient(135deg, #020617, #050b18);
+            background-attachment: fixed; height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; color: var(--text-light);
+        }
+
+        body::after { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url(https://grainy-gradients.vercel.app/noise.svg); opacity: 0.03; pointer-events: none; z-index: 1; }
+
+        .login-card {
+            width: 100%; max-width: 420px; padding: 60px 45px; background: rgba(255, 255, 255, 0.01) !important; backdrop-filter: blur(40px) saturate(250%) brightness(1.2) !important; -webkit-backdrop-filter: blur(40px) saturate(250%) brightness(1.2); border-radius: 4rem; border: 1px solid rgba(255, 255, 255, 0.12) !important; border-top: 3px solid rgba(255, 255, 255, 0.6) !important; border-left: 1.5px solid rgba(255, 255, 255, 0.25) !important; box-shadow: 0 50px 100px rgba(0, 0, 0, 0.7), inset 0 1px 4px rgba(255, 255, 255, 0.3); text-align: center; position: relative; z-index: 2; transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .login-card:hover { transform: scale(1.01) translateY(-5px); background: rgba(255, 255, 255, 0.03) !important; border-top-color: rgba(255, 255, 255, 0.8) !important; }
+        h2 { font-weight: 600; margin-bottom: 35px; letter-spacing: 4px; text-transform: uppercase; text-shadow: 0 0 20px rgba(0, 242, 255, 0.4); }
+        .input-group { margin-bottom: 25px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; font-size: 13px; opacity: 0.7; padding-left: 15px; letter-spacing: 1px; }
+        .input-group input { width: 100%; padding: 14px 22px; background: rgba(255, 255, 255, 0.02) !important; backdrop-filter: blur(15px) saturate(180%); -webkit-backdrop-filter: blur(15px) saturate(180%); border-radius: 2rem; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 1.5px solid rgba(255, 255, 255, 0.45) !important; border-left: 1px solid rgba(255, 255, 255, 0.15) !important; color: #fff; outline: none; font-family: inherit; box-sizing: border-box; box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15); transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+        .input-group input:focus { background: rgba(255, 255, 255, 0.08) !important; border-top-color: var(--accent) !important; transform: translateY(-1px) scale(1.02); }
+        .btn-login { width: 100%; padding: 16px; background: linear-gradient(135deg, #00f2ff 0%, #0072ff 100%); border: none; border-radius: 2.5rem; color: #fff; font-weight: 600; cursor: pointer; transition: 0.4s; margin-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 10px 25px rgba(0, 114, 255, 0.4); }
+        .btn-login:hover { transform: translateY(-3px) scale(1.02); filter: brightness(1.1); box-shadow: 0 15px 35px rgba(0, 242, 255, 0.6); }
+        .error-msg { color: #ff4d4d; background: rgba(255, 77, 77, 0.1); padding: 10px; border-radius: 1rem; border: 1px solid rgba(255, 77, 77, 0.2); margin-bottom: 15px; font-size: 14px; }
+        .footer-links { margin-top: 30px; font-size: 12px; }
+        .footer-links a { color: rgba(255, 255, 255, 0.5); text-decoration: none; transition: 0.3s; }
+        .footer-links a:hover { color: #fff; text-shadow: 0 0 10px #fff; }
+        .btn-home { position: absolute; top: 25px; left: 25px; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; border-radius: 50% !important; background: rgba(255, 255, 255, 0.03) !important; backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.1) !important; border-top: 2px solid rgba(255, 255, 255, 0.6) !important; border-left: 1px solid rgba(255, 255, 255, 0.2) !important; color: rgba(255, 255, 255, 0.8); font-size: 15px; text-decoration: none; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.2); transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); z-index: 10; }
+        .btn-home:hover { background: rgba(255, 255, 255, 0.1) !important; color: var(--accent); transform: scale(1.1); border-top-color: #fff !important; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 229, 255, 0.3); }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <a th:href="@{/index}" class="btn-home" title="Về trang chủ">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+
+        <h2>Đăng Nhập</h2>
+
+        <div th:if="${error != null}" class="error-msg" th:text="${error}"></div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="input-group">
+                <label>Tên đăng nhập</label>
+                <input type="text" name="username" placeholder="Username" required />
+            </div>
+            <div class="input-group">
+                <label>Mật khẩu</label>
+                <input type="password" name="password" placeholder="••••••••" required />
+            </div>
+            <button type="submit" class="btn-login">ĐĂNG NHẬP</button>
+        </form>
+
+        <div class="footer-links">
+            <a th:href="@{/forgot-password}">Quên mật khẩu?</a> | 
+            <a th:href="@{/register}">Đăng ký mới</a>
+        </div>
+    </div>
+
+</body>
+</html>
