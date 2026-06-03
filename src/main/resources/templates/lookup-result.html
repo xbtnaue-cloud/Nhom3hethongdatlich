@@ -43,7 +43,7 @@
         }
 
         .header-title { text-align: center; margin-bottom: 30px; }
-        .header-title h2 { font-size: 24px; letter-spacing: 1.5px; text-transform: uppercase; background: linear-gradient(to right, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+        .header-title h2 { font-size: 24px; letter-spacing: 1.5px; text-transform: uppercase; background: linear-gradient(to right, #fff, var(--accent)); -webkit-background-clip: text;background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
 
         .glass-table-wrapper { overflow: visible !important; border-radius: 20px; background: rgba(0, 0, 0, 0.2); }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
@@ -153,10 +153,10 @@
                             
 							<td style="text-align: center;">
 							    <th:block th:if="${a.status == 'Pending'}">
-							        <button class="btn-cancel-trigger" 
-							                th:onclick="openCancelModal([[${a.appointmentID}]], [[${a.appointmentDate}]], [[${a.serviceName}]])">
-							            Hủy lịch
-							        </button>
+									<button class="btn-cancel-trigger" 
+									        th:onclick="openCancelModal([[${a.appointmentID}]], [[${a.appointmentDate}]], [[${a.serviceName}]], [[${a.status}]])">
+									    Hủy lịch
+									</button>
 							    </th:block>
 							    
 							    <th:block th:unless="${a.status == 'Pending'}">

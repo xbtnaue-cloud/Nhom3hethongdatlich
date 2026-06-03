@@ -3,7 +3,6 @@ package com.nhakhoa.controller;
 import com.nhakhoa.dao.AppointmentDAO;
 import com.nhakhoa.dao.UserDAO;
 import com.nhakhoa.model.Appointment;
-import com.nhakhoa.model.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,55 +19,47 @@ import java.util.Map;
 public class PatientDetailController {
 
     // Gom cả GET và POST về chung một lộ trình xử lý tương thích logic cũ
-    @RequestMapping(value = "/patient-detail", method = {RequestMethod.GET, RequestMethod.POST})
-    public String getPatientDetail(
-            @RequestParam(value = "id", required = false) Integer patientId,
-            @RequestParam(value = "phone", required = false) String phone,
-            @RequestParam(value = "ajax", required = false) String isAjax,
-            Model model) {
+	@RequestMapping(value = "/patient-detail", method = {RequestMethod.GET, RequestMethod.POST})
+	@ResponseBody // 🌟 Đặt thẳng ở đây để Controller này luôn trả về dữ liệu (JSON/Object)
+	public Object handlePatientDetail(
+	        @RequestParam(value = "id", required = false) Integer patientId,
+	        @RequestParam(value = "phone", required = false) String phone,
+	        @RequestParam(value = "ajax", required = false) String isAjax,
+	        Model model) {
 
-        // Kiểm tra phòng hờ nếu URL không truyền ID lên
-        if (patientId == null) {
-            return "redirect:/patients";
-        }
+	    try {
+	        AppointmentDAO appDao = new AppointmentDAO();
+	        UserDAO uDao = new UserDAO();
+	        List<Appointment> medicalHistory = (patientId != null && patientId > 0) 
+	            ? uDao.getPatientMedicalHistory(patientId) 
+	            : (phone != null ? appDao.getAppointmentsByPhone(phone) : new ArrayList<>());
 
-        try {
-            AppointmentDAO appDao = new AppointmentDAO();
-            UserDAO uDao = new UserDAO();
-            List<Appointment> medicalHistory = new ArrayList<>();
+	        // --- NẾU LÀ AJAX (Hiển thị Modal) ---
+	        if ("true".equals(isAjax)) {
+	            List<Map<String, Object>> jsonResponse = new ArrayList<>();
+	            for (Appointment app : medicalHistory) {
+	                Map<String, Object> map = new HashMap<>();
+	                map.put("appointmentDate", app.getAppointmentDate() != null ? app.getAppointmentDate().toString() : "N/A");
+	                map.put("serviceName", app.getServiceName() != null ? app.getServiceName() : "Khám tổng quát");
+	                map.put("dentistName", app.getDentistName() != null ? app.getDentistName() : "Chưa phân công");
+	                map.put("price", app.getPrice());
+	                jsonResponse.add(map);
+	            }
+	            return jsonResponse; // Trả về JSON cho fetch
+	        }
 
-            // ── 1. PHÂN LOẠI BỆNH NHÂN ĐỂ LẤY LỊCH SỬ KHÁM ──────────────────────
-            if (patientId > 0) {
-                // Trường hợp 1: Bệnh nhân có tài khoản hệ thống (ID > 0)
-                medicalHistory = uDao.getPatientMedicalHistory(patientId);
-            } else if (phone != null && !phone.isBlank()) {
-                // Trường hợp 2: Khách vãng lai (ID = 0) - Tìm kiếm bằng Số điện thoại
-                medicalHistory = appDao.getAppointmentsByPhone(phone);
-            }
+	        // --- NẾU LÀ XEM TRANG CHI TIẾT (HTML) ---
+	        if (patientId != null && patientId > 0) {
+	            model.addAttribute("p", uDao.getUserByID(patientId));
+	        }
+	        model.addAttribute("history", medicalHistory);
+	        return "patient_detail"; // Trả về file HTML
 
-            // ── 2. XỬ LÝ TRẢ VỀ JSON CHO AJAX (Hiển thị Popup Modal) ───────────
-            if ("true".equals(isAjax)) {
-                // Ta lưu danh sách Map này trực tiếp vào model tạm thời và rẽ nhánh sang một API Controller khác, 
-                // hoặc cách nhanh nhất là ní trả về một chuỗi xử lý chuyển hướng nội bộ.
-                // Để tối ưu và giữ nguyên luồng húp chuỗi JSON chuẩn bài, ní dùng "forward" sang đường dẫn API bên dưới nhé!
-                model.addAttribute("sharedHistory", medicalHistory);
-                return "forward:/api/patient-detail-json";
-            }
-
-            // ── 3. XỬ LÝ HIỂN THỊ CHUYỂN TRANG TRUYỀN THỐNG (Admin/Bác sĩ xem chi tiết) ──
-            if (patientId > 0) {
-                User patient = uDao.getUserByID(patientId);
-                model.addAttribute("p", patient); // Gửi thông tin cá nhân
-            }
-            
-            model.addAttribute("history", medicalHistory); // Gửi danh sách lịch sử khám
-            return "patient_detail"; // Mở file patient_detail.html trong thư mục templates
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "error";
-        }
-    }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return "error";
+	    }
+	}
 
     // ── 4. API BỔ TRỢ: Tự động xuất chuỗi mảng JSON an toàn, sạch sẽ khớp Frontend cũ ──
     @RequestMapping(value = "/api/patient-detail-json", method = {RequestMethod.GET, RequestMethod.POST})

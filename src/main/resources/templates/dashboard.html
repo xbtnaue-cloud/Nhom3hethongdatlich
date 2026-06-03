@@ -21,7 +21,7 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: radial-gradient(at 0% 0%, rgba(0, 212, 255, 0.2) 0px, transparent 45%), radial-gradient(at 100% 0%, rgba(0, 114, 255, 0.15) 0px, transparent 40%), #04070d; background-attachment: fixed; color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; position: relative; }
         body::before { content: ""; position: fixed; top: -20%; left: -20%; width: 140%; height: 140%; background: radial-gradient(circle, rgba(0, 212, 255, 0.04) 0%, transparent 60%); animation: liquidMove 20s infinite alternate ease-in-out; z-index: -1; pointer-events: none; }
         @keyframes liquidMove { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-10%, -5%) scale(1.1); } }
-        .main { margin-left: 250px; padding: 28px 30px; width: calc(100% - 250px); }
+        .main { margin-left: 230px; padding: 28px 30px; width: calc(100% - 250px); }
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
         .page-header h2 { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(40px) saturate(200%); -webkit-backdrop-filter: blur(40px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 2px solid rgba(255, 255, 255, 0.5); border-left: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 25px 50px rgba(0,0,0,0.6), inset 0 1px 3px rgba(255,255,255,0.2); transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
@@ -397,28 +397,31 @@
     let cancelTargetId = null;
 
     // 🛠️ HÀM NÂNG CẤP CHÍNH: Quét toàn bộ dòng tr trong tbody để đếm tổng số liệu realtime
-    function updateDashboardCounters() {
-        const rows = document.querySelectorAll('#tableBody tr');
-        let total = 0, pending = 0, confirmed = 0, cancelled = 0;
+	function updateDashboardCounters() {
+	    const rows = document.querySelectorAll('#tableBody tr');
+	    let total = 0, pending = 0, confirmed = 0, cancelled = 0, completed = 0; // Thêm biến completed
 
-        rows.forEach(row => {
-            // Chỉ đếm những dòng dữ liệu lịch hẹn thực tế (bỏ qua dòng báo trống colspan)
-            if (row.dataset.status) {
-                total++;
-                const st = row.dataset.status;
-                if (st === 'Pending') pending++;
-                if (st === 'Confirmed' || st === 'Approved') confirmed++;
-                if (st === 'Cancelled') cancelled++;
-            }
-        });
+	    rows.forEach(row => {
+	        if (row.dataset.status) {
+	            total++;
+	            const st = row.dataset.status;
+	            if (st === 'Pending') pending++;
+	            if (st === 'Confirmed' || st === 'Approved') confirmed++;
+	            if (st === 'Cancelled') cancelled++;
+	            
+	            // 🌟 THÊM DÒNG NÀY: Kiểm tra nếu trạng thái là Completed
+	            if (st === 'Completed') completed++; 
+	        }
+	    });
 
-        // Đổ dữ liệu đếm được ra màn hình
-        document.getElementById('count-total').textContent = total;
-        document.getElementById('count-pending').textContent = pending;
-        document.getElementById('count-confirmed').textContent = confirmed;
-        document.getElementById('count-cancelled').textContent = cancelled;
-    }
-
+	    document.getElementById('count-total').textContent = total;
+	    document.getElementById('count-pending').textContent = pending;
+	    document.getElementById('count-confirmed').textContent = confirmed;
+	    document.getElementById('count-cancelled').textContent = cancelled;
+	    
+	    // 🌟 THÊM DÒNG NÀY: Đổ dữ liệu vào ID count-completed
+	    document.getElementById('count-completed').textContent = completed; 
+	}
     function switchTab(tab) {
         currentTab = tab;
         document.querySelectorAll('.tab-btn').forEach((b,i) => {
