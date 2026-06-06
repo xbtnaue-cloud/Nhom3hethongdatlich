@@ -1,58 +1,47 @@
 package com.nhakhoa.controller;
 
-import com.nhakhoa.dao.AppointmentDAO;
-import com.nhakhoa.model.Appointment;
-import com.nhakhoa.model.User;
+import com.nhakhoa.dto.AppointmentDTO;
+import com.nhakhoa.service.AppointmentService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.SessionAttribute;
-
+import org.springframework.web.bind.annotation.RequestMapping;
+import java.security.Principal;
 import java.util.List;
 
-@Controller // Đổi sang Annotation của Spring
+@Controller
+@RequestMapping("/admin") // Đường dẫn gốc cho tất cả các trang admin
 public class AdminController {
 
-    // Gom cả xử lý GET và POST chung một logic giống như processRequest ngày xưa của ní
-    @GetMapping("/admin-dashboard")
-    public String showAdminDashboard(
-            // Tự động bốc đối tượng "acc" trong Session ra, nếu chưa đăng nhập thì trả về null chứ không crash
-            @SessionAttribute(value = "acc", required = false) User acc, 
-            Model model) {
+    @Autowired
+    private AppointmentService appointmentService;
+
+    // Truy cập: /admin/dashboard
+    @GetMapping("/dashboard")
+    public String showAdminDashboard(Principal principal, Model model) {
+        
+        // 1. Spring Security tự động chặn các role không phải ADMIN ở SecurityConfig
+        // Principal là đối tượng chứa thông tin user đang đăng nhập
+        if (principal == null) {
+            return "redirect:/login";
+        }
 
         try {
-            // --- KIỂM TRA BẢO MẬT (SECURITY) ---
-            // Nếu chưa đăng nhập hoặc không phải Role Admin (RoleID != 1)
-            if (acc == null || acc.getRoleID() != 1) {
-                // Trong Spring Boot, trang login.html của ní nằm trong templates nên redirect thẳng qua url login
-                return "redirect:/login"; 
-            }
+            // 2. Gọi service lấy dữ liệu (không dùng DAO trực tiếp)
+            List<AppointmentDTO> listA = appointmentService.getAllAppointments();
 
-            // 2. Lấy dữ liệu lịch hẹn từ AppointmentDAO cũ
-            AppointmentDAO dao = new AppointmentDAO();
-            List<Appointment> listA = dao.getAllAppointments(); 
-
-            // 3. Đẩy dữ liệu vào Model (Thay thế cho request.setAttribute)
-            // Tên "listApp" giữ nguyên để đồng bộ với vòng lặp th:each trong file html mới
+            // 3. Đẩy dữ liệu vào model
             model.addAttribute("listApp", listA);
+            model.addAttribute("activePage", "appointments");
             
-            // 4. Chuyển hướng tới trang Dashboard (Mở file dashboard.html trong thư mục templates)
+            // 4. Trả về file dashboard.html (đảm bảo file nằm ở templates/dashboard.html)
             return "dashboard";
             
         } catch (Exception e) {
             e.printStackTrace();
-            // Đẩy thông báo lỗi sang giao diện nếu có sự cố
             model.addAttribute("error", "Lỗi tải dữ liệu Dashboard: " + e.getMessage());
-            return "error"; // Mở file error.html trong thư mục templates
+            return "error";
         }
-    }
-
-    // Nếu hệ thống cũ có form nào POST tới /admin-dashboard thì nó sẽ chạy vào đây
-    @PostMapping("/admin-dashboard")
-    public String handlePostDashboard(
-            @SessionAttribute(value = "acc", required = false) User acc, 
-            Model model) {
-        return showAdminDashboard(acc, model); // Gọi lại hàm GET ở trên để xử lý chung logic
     }
 }

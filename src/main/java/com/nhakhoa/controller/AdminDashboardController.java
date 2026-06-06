@@ -1,93 +1,88 @@
 package com.nhakhoa.controller;
 
-import com.nhakhoa.dao.AppointmentDAO;
-import com.nhakhoa.dao.UserDAO;
 import com.nhakhoa.model.User;
+import com.nhakhoa.service.UserService;
+import com.nhakhoa.service.AppointmentService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
-@Controller // Đổi sang Annotation của Spring
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+@Controller
 public class AdminDashboardController {
 
-    // Thay thế hoàn toàn cho doGet, doPost và @WebServlet(urlPatterns = {"/admin-stats"})
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private AppointmentService appointmentService;
+
     @GetMapping("/admin-stats")
-    public String showDashboardStats(
-            @SessionAttribute(value = "acc", required = false) User acc, 
-            Model model) {
+    public String showDashboardStats(@SessionAttribute(value = "acc", required = false) User acc, Model model) {
         
-        // 1. Kiểm tra quyền truy cập (Chỉ cho phép Admin=1 hoặc Bác sĩ=2)
         if (acc == null || (acc.getRoleID() != 1 && acc.getRoleID() != 2)) {
-            return "redirect:/login"; // Đá về trang login nếu không đủ quyền
+            return "redirect:/login";
         }
 
-        // 2. Khởi tạo các DAO cũ của ní
-        UserDAO uDao = new UserDAO();
-        AppointmentDAO aDao = new AppointmentDAO();
-
         try {
-            // KHAI BÁO CÁC BIẾN THỐNG KÊ
-            int totalPatients, totalDoctors, totalAppointments, pending, confirmed, completed, cancelled;
-            double totalRevenue;
-
+            // 1. Thống kê số liệu thẻ (Cards)
             if (acc.getRoleID() == 1) {
-                // --- TRƯỜNG HỢP: QUẢN TRỊ VIÊN (ADMIN) ---
-                totalPatients = uDao.getTotalPatients();
-                totalDoctors = uDao.getActiveDoctorsCount(); 
-                totalRevenue = aDao.getTotalRevenue();
-                totalAppointments = aDao.getTotalAppointments();
-                
-                // Thống kê trạng thái toàn hệ thống
-                pending = aDao.countByStatus("Pending");
-                confirmed = aDao.countByStatus("Confirmed");
-                completed = aDao.countByStatus("Completed");
-                cancelled = aDao.countByStatus("Cancelled");
-                
                 model.addAttribute("roleName", "Quản trị viên");
+                model.addAttribute("totalPatients", appointmentService.countTotalPatients());
+                model.addAttribute("totalDoctors", userService.countActiveDoctors());
+                model.addAttribute("totalRevenue", appointmentService.getTotalRevenue());
+                model.addAttribute("totalAppointments", appointmentService.countTotalAppointments());
+                model.addAttribute("pending", appointmentService.countByStatus("Pending"));
+                model.addAttribute("confirmed", appointmentService.countByStatus("Confirmed"));
+                model.addAttribute("completed", appointmentService.countByStatus("Completed"));
+                model.addAttribute("cancelled", appointmentService.countByStatus("Cancelled"));
             } else {
-                // --- TRƯỜNG HỢP: BÁC SĨ CHUYÊN KHOA ---
-                int dID = acc.getUserID();
-                
-                totalPatients = aDao.getPatientsByDentist(dID).size(); 
-                totalDoctors = (acc.getStatusID() == 1) ? 1 : 0;
-                totalRevenue = aDao.getRevenueByDentist(dID);
-                totalAppointments = aDao.getAppointmentsByDentist(dID).size();
-                
-                // Thống kê trạng thái của riêng bác sĩ đó
-                pending = aDao.countByStatusAndDentist("Pending", dID);
-                confirmed = aDao.countByStatusAndDentist("Confirmed", dID);
-                completed = aDao.countByStatusAndDentist("Completed", dID);
-                cancelled = aDao.countByStatusAndDentist("Cancelled", dID);
-                
                 model.addAttribute("roleName", "Bác sĩ chuyên khoa");
+                int dID = acc.getUserID();
+                model.addAttribute("totalPatients", appointmentService.countUniquePatientsByDentist(dID));
+                model.addAttribute("totalDoctors", (acc.getStatusID() == 1) ? 1 : 0);
+                model.addAttribute("totalRevenue", appointmentService.getRevenueByDentist(dID));
+                model.addAttribute("totalAppointments", appointmentService.countAppointmentsByDentist(dID));
+                model.addAttribute("pending", appointmentService.countByStatusAndDentist("Pending", dID));
+                model.addAttribute("confirmed", appointmentService.countByStatusAndDentist("Confirmed", dID));
+                model.addAttribute("completed", appointmentService.countByStatusAndDentist("Completed", dID));
+                model.addAttribute("cancelled", appointmentService.countByStatusAndDentist("Cancelled", dID));
             }
 
-            // 3. ĐẨY DỮ LIỆU RA MODEL (Thay thế hoàn toàn cho request.setAttribute)
-            model.addAttribute("totalPatients", totalPatients);
-            model.addAttribute("totalDoctors", totalDoctors); 
-            model.addAttribute("totalRevenue", totalRevenue);
-            model.addAttribute("totalAppointments", totalAppointments);
-            model.addAttribute("pending", pending);
-            model.addAttribute("confirmed", confirmed);
-            model.addAttribute("completed", completed);
-            model.addAttribute("cancelled", cancelled);
+            // 2. Tính toán dữ liệu biểu đồ (3 tháng gần nhất)
+            List<String> labels = new ArrayList<>();
+            List<Long> data = new ArrayList<>();
+            LocalDate now = LocalDate.now();
 
-            // Gán trạng thái active để file HTML xử lý sáng menu Sidebar
-            model.addAttribute("activePage", "dashboard");
+            for (int i = 2; i >= 0; i--) {
+                LocalDate d = now.minusMonths(i);
+                labels.add("Tháng " + d.getMonthValue());
+                
+                if (acc.getRoleID() == 1) {
+                    data.add(appointmentService.countByMonth(d.getMonthValue(), d.getYear()));
+                } else {
+                    data.add(appointmentService.countByMonthAndDentist(d.getMonthValue(), d.getYear(), acc.getUserID()));
+                }
+            }
             
-            // Trả về file admin-dashboard.html trong thư mục templates
-            return "admin-dashboard";
+            model.addAttribute("chartLabels", labels);
+            model.addAttribute("chartData", data);
+            model.addAttribute("activePage", "dashboard");
+
+            return "admin-dashboard"; // Đặt return ở cuối sau khi đã thêm đầy đủ attributes
 
         } catch (Exception e) {
             e.printStackTrace();
-            // Nếu có lỗi hệ thống, vẫn mở trang dashboard trống để tránh sập web trống trải
             return "admin-dashboard";
         }
     }
 
-    // Map thêm phương thức POST đề phòng trường hợp form cũ submit bằng POST qua url này
     @PostMapping("/admin-stats")
     public String handlePostStats(@SessionAttribute(value = "acc", required = false) User acc, Model model) {
         return showDashboardStats(acc, model);

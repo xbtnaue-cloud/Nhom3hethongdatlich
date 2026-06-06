@@ -141,29 +141,31 @@
 <body>
 
     <div th:fragment="sidebar" class="sidebar">
-        <div class="profile-box">
-            <div class="admin-avatar" 
-                 th:text="${session.acc != null and session.acc.fullName != null} ? ${#strings.toUpperCase(#strings.substring(session.acc.fullName, 0, 1))} : 'A'">
-                A
-            </div>
-            <div class="admin-info">
-                <strong th:text="${session.acc != null and session.acc.fullName != null} ? ${session.acc.fullName} : 'Admin'">Admin</strong>
-                <span th:text="${session.acc != null} ? '@' + ${session.acc.username} : '@admin'">@admin</span>
-                
-                <div style="margin-top: 4px; font-size: 8px; padding: 2px 8px; background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 6px; color: #00d4ff; width: fit-content; text-transform: uppercase; font-weight: 700;">
-                    <span th:if="${session.acc != null and session.acc.roleID == 1}">Quản trị viên</span>
-                    <th:block th:unless="${session.acc != null and session.acc.roleID == 1}">
-                        <span th:text="${session.acc != null and session.acc.specialty != null and !#strings.isEmpty(session.acc.specialty)} ? ${session.acc.specialty} : 'Bác sĩ chuyên khoa'">Bác sĩ chuyên khoa</span>
-                    </th:block>
-                </div>
-            </div>
-        </div>
+		<div class="profile-box" sec:authorize="isAuthenticated()">
+		    <div class="admin-avatar" 
+		         th:text="${currentUser != null} ? ${#strings.toUpperCase(#strings.substring(currentUser.fullName, 0, 1))} : 'A'">
+		        A
+		    </div>
+		    <div class="admin-info">
+		        <strong th:text="${currentUser != null ? currentUser.fullName : 'Admin'}">Admin</strong>
+		        <span th:text="'@' + ${#authentication.principal.username}">@username</span>
+		        
+		        <div style="margin-top: 4px; font-size: 8px; padding: 2px 8px; background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 6px; color: #00d4ff; width: fit-content; text-transform: uppercase; font-weight: 700;">
+		            <span sec:authorize="hasRole('ADMIN')">Quản trị viên</span>
+		            <span sec:authorize="hasRole('DENTIST')" 
+		                  th:text="${currentUser != null and currentUser.specialty != null} ? ${currentUser.specialty} : 'Bác sĩ chuyên khoa'">
+		                  Bác sĩ chuyên khoa
+		            </span>
+		        </div>
+		    </div>
+		</div>
 
         <nav>
-            <a th:href="@{/admin-dashboard}" class="nav-item" 
-               th:classappend="${#strings.isEmpty(activePage) or activePage == 'appointments'} ? 'active' : ''">
-                <i class="fa-solid fa-calendar-check"></i> Lịch hẹn
-            </a>
+			<a th:href="${#authorization.expression('hasRole(''ADMIN'')')} ? @{/admin/dashboard} : @{/dentist/dashboard}" 
+			   class="nav-item" 
+			   th:classappend="${activePage == 'appointments'} ? 'active' : ''">
+			    <i class="fa-solid fa-calendar-check"></i> Lịch hẹn
+			</a>
 
             <a th:href="@{/patients}" class="nav-item" 
                th:classappend="${activePage == 'patients'} ? 'active' : ''">
@@ -180,11 +182,10 @@
                 <i class="fa-solid fa-chart-line"></i> Thống kê
             </a>
 
-            <th:block th:if="${session.acc != null and session.acc.roleID == 1}">
-                <a th:href="@{/manage-doctors}" class="nav-item" 
-                   th:classappend="${activePage == 'doctors'} ? 'active' : ''">
-                    <i class="fa-solid fa-user-doctor"></i> Bác sĩ
-                </a>
+			<th:block sec:authorize="hasRole('ADMIN')">
+			            <a th:href="@{/manage-doctors}" class="nav-item" th:classappend="${activePage == 'doctors'} ? 'active' : ''">
+			                <i class="fa-solid fa-user-doctor"></i> Bác sĩ
+			            </a>
 
                 <a th:href="@{/manage-services}" class="nav-item" 
                    th:classappend="${activePage == 'services'} ? 'active' : ''">

@@ -1,86 +1,43 @@
 package com.nhakhoa.model;
 
+import jakarta.persistence.*;
+import lombok.Data;
 import java.sql.Timestamp;
 
+@Entity
+@Table(name = "Contacts")
+@Data // Tự động tạo Getter, Setter, toString...
 public class Contact {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int contactID;
+
+    @Column(name = "FullName")
     private String fullName;
+
+    @Column(name = "Email")
     private String email;
+
+    @Column(name = "Message")
     private String message;
+
+    @Column(name = "Status")
     private String status;
+
+    @Column(name = "CreatedAt")
     private Timestamp createdAt;
+
+    @Column(name = "ReplyMessage")
     private String replyMessage;
-    private int userID;    // ID tài khoản (nếu có)
-    private String username; // Tên đăng nhập để hiển thị cho Admin biết
-    public String getReplyMessage() { return replyMessage; }
-    // --- Constructor không đối số ---
-    public Contact() {
-    }
 
-    // --- Constructor đầy đủ đối số (Tùy chọn) ---
-    public Contact(int contactID, String fullName, String email, String message, String status, Timestamp createdAt) {
-        this.contactID = contactID;
-        this.fullName = fullName;
-        this.email = email;
-        this.message = message;
-        this.status = status;
-        this.createdAt = createdAt;
-    }
+    @Column(name = "UserID")
+    private Integer userID;
 
-    // --- GETTER VÀ SETTER (Cực kỳ quan trọng để hết lỗi đỏ) ---
+    // Các trường không có trong bảng Contacts, dùng để hiển thị dữ liệu từ JOIN
+    @Transient 
+    private String username;
 
-    public int getContactID() {
-        return contactID;
-    }
-
-    public void setContactID(int contactID) {
-        this.contactID = contactID;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-    
-    public int getUserID() { return userID; }
-    public void setUserID(int userID) { this.userID = userID; }
-    
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-    public void setReplyMessage(String replyMessage) { this.replyMessage = replyMessage; }
+    // Constructor không đối số (bắt buộc cho JPA)
+    public Contact() {}
 }

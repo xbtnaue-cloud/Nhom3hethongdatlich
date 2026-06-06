@@ -560,16 +560,19 @@
         document.querySelectorAll('.reason-chip').forEach(c => c.classList.remove('selected'));
     }
 
-    function confirmCancel() {
-        const reason = document.getElementById('cancelReason').value.trim();
-        if (!reason) {
-            document.getElementById('cancelReason').focus();
-            document.getElementById('cancelReason').style.borderColor = 'rgba(255,107,107,0.6)';
-            setTimeout(() => document.getElementById('cancelReason').style.borderColor = '', 1500);
-            return;
-        }
-        window.location.href = "update-status?id=" + cancelTargetId + "&status=Cancelled&reason=" + encodeURIComponent(reason);
-    }
+	function confirmCancel() {
+	    const reason = document.getElementById('cancelReason').value.trim();
+
+	    if (!reason) {
+	        alert("Vui lòng nhập lý do hủy!");
+	        return;
+	    }
+
+	    window.location.href =
+	        "/update-status?id=" + cancelTargetId +
+	        "&status=Cancelled&reason=" +
+	        encodeURIComponent(reason);
+	}
 
     document.getElementById('cancelOverlay').addEventListener('click', function(e) {
         if (e.target === this) closeCancelPopup();

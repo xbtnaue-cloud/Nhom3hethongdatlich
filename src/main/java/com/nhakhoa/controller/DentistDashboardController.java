@@ -1,61 +1,56 @@
 package com.nhakhoa.controller;
 
-import com.nhakhoa.dao.AppointmentDAO;
 import com.nhakhoa.model.Appointment;
 import com.nhakhoa.model.User;
+import com.nhakhoa.repository.UserRepository;
+import com.nhakhoa.service.AppointmentService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.SessionAttribute;
-
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import com.nhakhoa.dto.AppointmentDTO;
+import java.util.stream.Collectors;
+@Controller
+public class DentistDashboardController {
 
-@Controller // Đổi sang Annotation của Spring
-public class DentistDashboardController { 
+    @Autowired
+    private AppointmentService appointmentService;
 
-    // Thay thế hoàn toàn cho doGet, doPost và urlPatterns = {"/dentist-dashboard"}
-    @GetMapping("/dentist-dashboard")
-    public String showDentistDashboard(
-            @SessionAttribute(value = "acc", required = false) User acc, 
-            Model model) {
+    @Autowired
+    private UserRepository userRepository;
 
-        // 1 & 2. Kiểm tra đăng nhập và phân quyền (Bắt buộc phải là Bác sĩ - RoleID = 2)
-        if (acc == null || acc.getRoleID() != 2) {
-            return "redirect:/login"; // Đá thẳng về url login nếu không hợp lệ
+    @GetMapping("/dentist/dashboard")
+    public String showDentistDashboard(Principal principal, Model model) {
+        // 1. Lấy thông tin user đăng nhập
+        String username = principal.getName();
+        User doctor = userRepository.findByUsername(username); 
+        
+        // 2. Kiểm tra NULL và quyền (RoleID = 2 là bác sĩ)
+        if (doctor == null || doctor.getRoleID() != 2) {
+            return "redirect:/login";
         }
+        
+        // 3. KHAI BÁO BIẾN dentistID TRƯỚC KHI DÙNG
+        // Lấy ID từ đối tượng doctor vừa tìm được (sử dụng getUserID() theo class User của bạn)
+        int dentistID = doctor.getUserID(); 
+        
+        // 4. Truyền đối tượng doctor vào model để file HTML dùng
+        model.addAttribute("doctor", doctor);
+        
+        // 5. Lấy danh sách lịch hẹn
+        List<Appointment> list = appointmentService.getAppointmentsByDentistEntity(dentistID);
 
-        // 3. Lấy ID bác sĩ đang đăng nhập hệ thống
-        int dentistID = acc.getUserID();
+        // 6. CHUYỂN ĐỔI SANG DTO
+        List<AppointmentDTO> listDTO = list.stream()
+                .map(appointmentService::convertToDTO)
+                .collect(Collectors.toList());
 
-        // Giữ lại log debug trên Console cho ní dễ theo dõi luồng chạy
-        System.out.println("=== DENTIST DASHBOARD DEBUG ===");
-        System.out.println("Login Dentist ID: " + dentistID);
-        System.out.println("Doctor Name: " + acc.getFullName());
+        model.addAttribute("listApp", listDTO);
+        model.addAttribute("activePage", "appointments");
 
-        // 4. Gọi AppointmentDAO cũ để lấy lịch hẹn của riêng bác sĩ này
-        AppointmentDAO dao = new AppointmentDAO();
-        List<Appointment> list = dao.getAppointmentsByDentist(dentistID);
-
-        // 5. Cơ chế bảo vệ Null-safe tránh lỗi crash giao diện hiển thị
-        if (list == null) {
-            list = new ArrayList<>();
-        }
-
-        System.out.println("Total appointments found: " + list.size());
-
-        // 6. Đẩy dữ liệu ra Model (Khớp 100% tên biến listApp cũ của ní)
-        model.addAttribute("listApp", list);
-        model.addAttribute("activePage", "appointments"); // Đánh dấu mục sáng trên menu Sidebar
-
-        // 7. Mở file giao diện tương ứng (Đổi từ views/dentist-schedule.jsp thành dentist-schedule.html)
         return "dentist-schedule";
-    }
-
-    // Đề phòng trường hợp form hoặc link nào submit bằng POST qua url này
-    @PostMapping("/dentist-dashboard")
-    public String handlePostDashboard(@SessionAttribute(value = "acc", required = false) User acc, Model model) {
-        return showDentistDashboard(acc, model); // Gọi lại hàm GET ở trên để xử lý chung logic
     }
 }

@@ -139,15 +139,16 @@
                                     <span th:case="'Confirmed'" class="badge confirmed">Đã duyệt</span>
                                     <span th:case="'Completed'" class="badge completed">Hoàn thành</span>
                                     
-                                    <div th:case="*" class="status-wrapper">
-                                        <span class="badge cancelled">Đã hủy</span>
-                                        <div th:if="${a.notes != null and !#strings.isEmpty(a.notes)}" class="reason-tooltip">
-                                            <div style="color: #ff4d4d; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; font-size: 9px;">
-                                                <i class="fa-solid fa-circle-info"></i> Thông tin từ phòng khám
-                                            </div>
-                                            <span th:text="${a.notes}">Lý do hủy</span>
-                                        </div>
-                                    </div>
+									<div th:case="'Cancelled'" class="status-wrapper">
+									    <span class="badge cancelled">Đã hủy</span>
+									    
+									    <div th:if="${a.notes != null and !#strings.isEmpty(a.notes)}" class="reason-tooltip">
+									        <div style="color: #ff4d4d; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; font-size: 9px;">
+									            <i class="fa-solid fa-circle-info"></i> Thông tin từ phòng khám
+									        </div>
+									        <span th:text="${#strings.replace(a.notes, 'null | ', '')}">Lý do hủy</span>
+									    </div>
+									</div>
                                 </div>
                             </td>
                             

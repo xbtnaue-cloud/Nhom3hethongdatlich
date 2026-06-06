@@ -1,39 +1,31 @@
 package com.nhakhoa.model;
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.sql.Timestamp;
 
+@Entity
+@Table(name = "ChatMessages") // Tên bảng trong DB
+@Data // Tự động sinh Getter, Setter, toString, etc.
+@NoArgsConstructor // Tạo constructor không tham số
+@AllArgsConstructor // Tạo constructor đầy đủ tham số
 public class ChatMessage {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int messageID;
+
+    @Column(name = "ContactID")
     private int contactID;
+
+    @Column(name = "SenderRole")
     private String senderRole; // 'Patient' hoặc 'Doctor'
+
+    @Column(name = "Content")
     private String content;
+
+    @Column(name = "CreatedAt")
     private Timestamp createdAt;
-
-    public ChatMessage() {
-    }
-
-    // Constructor đầy đủ
-    public ChatMessage(int messageID, int contactID, String senderRole, String content, Timestamp createdAt) {
-        this.messageID = messageID;
-        this.contactID = contactID;
-        this.senderRole = senderRole;
-        this.content = content;
-        this.createdAt = createdAt;
-    }
-
-    // Getter và Setter (Bắt buộc phải có để DAO và Servlet gọi được)
-    public int getMessageID() { return messageID; }
-    public void setMessageID(int messageID) { this.messageID = messageID; }
-
-    public int getContactID() { return contactID; }
-    public void setContactID(int contactID) { this.contactID = contactID; }
-
-    public String getSenderRole() { return senderRole; }
-    public void setSenderRole(String senderRole) { this.senderRole = senderRole; }
-
-    public String getContent() { return content; }
-    public void setContent(String content) { this.content = content; }
-
-    public Timestamp getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 }

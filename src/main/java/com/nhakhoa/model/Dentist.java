@@ -1,79 +1,34 @@
 package com.nhakhoa.model;
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "Dentists")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Dentist {
-    private int dentistID;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "dentistid") // Phải khớp với tên cột trong DB của bạn
+    private int dentistID; // Tự động khớp với dentisid nếu dùng naming strategy
+
+    @Column(name = "full_name") // Sửa thành full_name (chữ thường)
     private String fullName;
-    private String specialization; // Chuyên khoa (như Niềng răng, Nhổ răng...)
+
+    @Column(name = "specialization") // Sửa thành specialization
+    private String specialization;
+
+    @Column(name = "phone") // Sửa thành phone
     private String phone;
+
+    @Column(name = "email") // Sửa thành email
     private String email;
-    private String image; // Đường dẫn ảnh đại diện bác sĩ
 
-    // 1. Constructor không đối số
-    public Dentist() {
-    }
-
-    // 2. Constructor có đối số
-    public Dentist(int dentistID, String fullName, String specialization, String phone, String email, String image) {
-        this.dentistID = dentistID;
-        this.fullName = fullName;
-        this.specialization = specialization;
-        this.phone = phone;
-        this.email = email;
-        this.image = image;
-    }
-
-    // 3. Getters and Setters
-    public int getDentistID() {
-        return dentistID;
-    }
-
-    public void setDentistID(int dentistID) {
-        this.dentistID = dentistID;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getSpecialization() {
-        return specialization;
-    }
-
-    public void setSpecialization(String specialization) {
-        this.specialization = specialization;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    // 4. toString
-    @Override
-    public String toString() {
-        return "Dentist{" + "fullName=" + fullName + ", spec=" + specialization + '}';
-    }
+    @Column(name = "image") // Sửa thành image
+    private String image;
 }

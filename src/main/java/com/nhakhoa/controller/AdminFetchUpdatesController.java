@@ -1,17 +1,21 @@
 package com.nhakhoa.controller;
 
-import com.nhakhoa.dao.ContactDAO;
 import com.nhakhoa.model.Contact;
+import com.nhakhoa.service.ContactService; // Import Service
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
 import java.util.List;
 
-@RestController // 1. Dùng RestController để Spring tự động convert dữ liệu trả về thành JSON
+@RestController
 public class AdminFetchUpdatesController {
 
-    // Xử lý chung cho cả yêu cầu GET và POST tới endpoint /admin-fetch-updates
+    @Autowired
+    private ContactService contactService; // Sử dụng Service thay vì DAO
+
     @GetMapping("/admin-fetch-updates")
     public List<Contact> fetchUpdatesGet() {
         return getContactList();
@@ -22,14 +26,14 @@ public class AdminFetchUpdatesController {
         return getContactList();
     }
 
-    // Hàm bổ trợ để gọi sang DAO lấy dữ liệu
     private List<Contact> getContactList() {
         try {
-            ContactDAO dao = new ContactDAO();
-            return dao.getAllContacts(); // Trả thẳng List về, Spring tự chuyển thành mảng JSON []
+            // Gọi Service để lấy danh sách liên hệ
+            return contactService.getAllContacts();
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            // Trả về danh sách rỗng nếu có lỗi thay vì null để frontend không bị crash
+            return Collections.emptyList();
         }
     }
 }

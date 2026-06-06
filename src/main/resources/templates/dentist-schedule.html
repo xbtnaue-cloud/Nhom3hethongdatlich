@@ -167,7 +167,9 @@
     <div class="main-content">
 
         <div class="header-section">
-            <h2>Chào mừng Bác sĩ, <span style="color:var(--accent)" th:text="${session.acc != null} ? ${session.acc.fullName} : 'Bác sĩ'">Bác sĩ</span></h2>
+			<h2>Chào mừng Bác sĩ, 
+			    <span style="color:var(--accent)" th:text="${doctor != null} ? ${doctor.fullName} : 'Bác sĩ'">Bác sĩ</span>
+			</h2>
             <div class="header-sub">
                 <div class="header-sub-icon">
                     <i class="fa-solid fa-calendar-check" style="color:var(--accent);font-size:11px;"></i>
@@ -625,7 +627,7 @@
             setTimeout(() => ta.style.borderColor = '', 1500);
             return;
         }
-        window.location.href = "update-status?id=" + cancelTargetId + "&status=Cancelled&reason=" + encodeURIComponent(reason);
+        window.location.href = "/update-status?id=" + cancelTargetId + "&status=Cancelled&reason=" + encodeURIComponent(reason);
     }
     document.getElementById('cancelOverlay').addEventListener('click', function(e) {
         if (e.target === this) closeCancelPopup();
